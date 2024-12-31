@@ -1,8 +1,10 @@
-use std::{fmt::Display, fs::File, io::Write};
-
+use std::{fmt::Display, fs::File, io::Write, process::Command};
+use std::fmt::format;
+use std::process::exit;
 use indoc::{formatdoc, indoc};
 
 use crate::model::{CStandard, CppStandard, Language};
+use crate::util::get_cmake_version;
 
 const EXAMPLE_C_PROGRAM: &'static str = indoc! {r#"
 #include <stdio.h>
@@ -66,8 +68,16 @@ fn get_cpp_cmakelists(project_name: &String, standard: CppStandard) -> String {
 }
 
 fn get_common_cmakelists<Env: Display>(project_name: &str, env: Env, exec: &str) -> String {
+    let cmake_version = match get_cmake_version() {
+        Ok(version) => format!("{}", version),
+        Err(e) => {
+            eprintln!("Error: {}", e);
+            exit(127);
+        }
+    };
+
     formatdoc! {r#"
-        cmake_minimum_required(VERSION 3.31.1)
+        cmake_minimum_required(VERSION {cmake_version})
 
         project({project_name})
 

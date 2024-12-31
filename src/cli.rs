@@ -16,9 +16,9 @@ pub enum NewSubcmd {
         name: String,
 
         /// The language of the project (can either be "c", "cpp", "cxx", or "c++")
-        #[arg(short, long, value_parser=parse_language)]
+        #[arg(short, long, value_parser=parse_language, default_value = "cpp")]
         language: Language,
-        
+
         /// The name of the folder to generate the project in (defaults to the project name)
         #[arg(short, long)]
         folder: Option<String>,
@@ -29,7 +29,7 @@ pub enum NewSubcmd {
         name: Option<String>,
 
         /// The language of the project (can either be "c", "cpp", "cxx", or "c++")
-        #[arg(short, long, value_parser=parse_language)]
+        #[arg(short, long, value_parser=parse_language, default_value = "cpp")]
         language: Language,
     },
 }
@@ -41,13 +41,13 @@ fn parse_language(lang: &str) -> Result<Language, String> {
     let supported_langs = ["c", "cpp", "cxx", "c++"];
 
     if supported_langs[0] == lang {
-        let standard = standard.map(|t| *t).unwrap_or("11");
+        let standard = standard.map(|t| *t).unwrap_or("23");
         let standard = CStandard::try_from(standard)?;
         return Ok(Language::C(standard));
     }
 
     if supported_langs[1..].contains(&lang) {
-        let standard = standard.map(|t| *t).unwrap_or("17");
+        let standard = standard.map(|t| *t).unwrap_or("23");
         let standard = CppStandard::try_from(standard)?;
         return Ok(Language::CPP(standard));
     }
