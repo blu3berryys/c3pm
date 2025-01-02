@@ -1,11 +1,13 @@
+#![allow(dead_code)]
+
 use crate::cli::{C3pmArgs, NewSubcmd};
 use crate::generator::generate_project;
-use crate::util::{create_dir, get_current_path};
+use crate::util::get_current_path;
 use clap::Parser;
 use std::path::PathBuf;
 use std::str::FromStr;
-
 mod cli;
+mod config_parser;
 mod generator;
 mod model;
 mod util;
@@ -19,17 +21,7 @@ fn main() -> Result<(), String> {
             language,
             folder,
         } => {
-            let folder_name = match folder {
-                Some(folder) => folder,
-                None => name.clone(),
-            };
-
-            let current_dir = get_current_path().map_err(|e| e.to_string())?;
-            let dir = create_dir(&current_dir, &folder_name).map_err(|e| e.to_string())?;
-
-            generate_project(dir, name, language).map_err(|e| e.to_string())?;
-
-            Ok(())
+            util::create_new_project(name, language, folder)?
         }
         NewSubcmd::Init { name, language } => {
             let current_dir =
@@ -54,6 +46,9 @@ fn main() -> Result<(), String> {
             .map_err(|e| e.to_string())?;
 
             Ok(())
+        }
+        NewSubcmd::Build { jobs, config } => {
+            util::build_project(&jobs, &config)
         }
     }
 }

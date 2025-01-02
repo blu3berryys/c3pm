@@ -1,4 +1,5 @@
-use crate::model::{CStandard, CppStandard, Language};
+use crate::util::AVAILABLE_THREADS;
+use crate::model::{BuildConfig, CStandard, CppStandard, Language};
 use clap::{Parser, Subcommand};
 
 #[derive(Parser, Debug)]
@@ -32,6 +33,16 @@ pub enum NewSubcmd {
         #[arg(short, long, value_parser=parse_language, default_value = "cpp")]
         language: Language,
     },
+    /// Builds the c3pm project
+    Build {
+        /// The number of threads to use for building
+        #[arg(short = 'j', long = "jobs", default_value_t = *AVAILABLE_THREADS)]
+        jobs: usize,
+
+        /// The build config to use (e.g. Debug, RelWithDebInfo, Release)
+        #[arg(short = 'c', long = "config", default_value = "RelWithDebInfo", value_parser=parse_build_config)]
+        config: BuildConfig,
+    },
 }
 
 fn parse_language(lang: &str) -> Result<Language, String> {
@@ -55,6 +66,29 @@ fn parse_language(lang: &str) -> Result<Language, String> {
     let formatted_possible_values = supported_langs.join(", ");
     Err(format!(
         "Possible values are {:?}",
+        formatted_possible_values
+    ))
+}
+
+fn parse_build_config(config: &str) -> Result<BuildConfig, String> {
+    let supported_configs = ["Debug", "RelWithDebInfo", "Release", "MinSizeRel"];
+
+    let config_str = format!("{}", config);
+
+    if supported_configs[1..].contains(&config_str.as_str()) {
+        return match config_str.as_str() {
+            "RelWithDebInfo" => Ok(BuildConfig::RelWithDebInfo),
+            "Release" => Ok(BuildConfig::Release),
+            "MinSizeRel" => Ok(BuildConfig::MinSizeRel),
+            "Debug" => Ok(BuildConfig::Debug),
+            &_ => Ok(BuildConfig::RelWithDebInfo),
+        }
+    }
+
+    let formatted_possible_values = supported_configs.join(", ");
+
+    Err(format!(
+        "Possible values are: {}",
         formatted_possible_values
     ))
 }

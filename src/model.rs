@@ -1,12 +1,15 @@
-use std::fmt::Display;
+use clap::builder::ValueParser;
+use serde::{Deserialize, Serialize};
+use std::fmt::{Display, Formatter};
+use std::str::FromStr;
 
-#[derive(Debug, Clone, Copy)]
+#[derive(Debug, Clone, Copy, Serialize, Deserialize)]
 pub enum Language {
     C(CStandard),
     CPP(CppStandard),
 }
 
-#[derive(Debug, Clone, Copy)]
+#[derive(Debug, Clone, Copy, Serialize, Deserialize)]
 pub enum CStandard {
     C89,
     C99,
@@ -15,7 +18,7 @@ pub enum CStandard {
     C23,
 }
 
-#[derive(Debug, Clone, Copy)]
+#[derive(Debug, Clone, Copy, Serialize, Deserialize)]
 pub enum CppStandard {
     Cpp98,
     Cpp11,
@@ -23,6 +26,25 @@ pub enum CppStandard {
     Cpp17,
     Cpp20,
     Cpp23,
+}
+
+#[derive(Debug, Clone, Copy, Serialize, Deserialize)]
+pub enum BuildConfig {
+    Debug,
+    RelWithDebInfo,
+    Release,
+    MinSizeRel,
+}
+
+impl Display for BuildConfig {
+    fn fmt(&self, f: &mut Formatter<'_>) -> std::fmt::Result {
+        match &self {
+            BuildConfig::Debug => f.write_str("Debug"),
+            BuildConfig::RelWithDebInfo => f.write_str("RelWithDebInfo"),
+            BuildConfig::Release => f.write_str("Release"),
+            BuildConfig::MinSizeRel => f.write_str("MinSizeRel"),
+        }
+    }
 }
 
 impl TryFrom<&str> for CStandard {
@@ -44,7 +66,7 @@ impl TryFrom<&str> for CStandard {
 }
 
 impl Display for CStandard {
-    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+    fn fmt(&self, f: &mut Formatter<'_>) -> std::fmt::Result {
         let str = match self {
             CStandard::C89 => "90",
             CStandard::C99 => "99",
@@ -75,7 +97,7 @@ impl TryFrom<&str> for CppStandard {
 }
 
 impl Display for CppStandard {
-    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+    fn fmt(&self, f: &mut Formatter<'_>) -> std::fmt::Result {
         let str = match self {
             CppStandard::Cpp98 => "98",
             CppStandard::Cpp11 => "11",
@@ -110,4 +132,34 @@ fn parse_standard<T: Copy>(value: &str, pairs: &[(T, &'static str)]) -> Result<T
         "Invalid standard version! Possible values are: {}",
         formatted_possible_values
     ))
+}
+
+impl Display for Language {
+    fn fmt(&self, f: &mut Formatter<'_>) -> std::fmt::Result {
+        let str = match &self {
+            Language::C(_) => "c".to_string(),
+            Language::CPP(_) => "c++".to_string(),
+        };
+        write!(f, "{}", str)
+    }
+}
+
+impl FromStr for BuildConfig {
+    type Err = String;
+
+    fn from_str(input: &str) -> Result<Self, Self::Err> {
+        match input.to_lowercase().as_str() {
+            "Debug" => Ok(BuildConfig::Debug),
+            "RelWithDebInfo" => Ok(BuildConfig::RelWithDebInfo),
+            "Release" => Ok(BuildConfig::Release),
+            "MinSizeRel" => Ok(BuildConfig::MinSizeRel),
+            _ => Err("Invalid BuildConfig. Possible values are: Debug, RelWithDebInfo, Release, MinSizeRel".to_string()),
+        }
+    }
+}
+
+impl Into<ValueParser> for BuildConfig {
+    fn into(self) -> ValueParser {
+        ValueParser::new(move |arg: &str| BuildConfig::from_str(arg))
+    }
 }
