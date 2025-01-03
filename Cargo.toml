@@ -11,3 +11,4 @@ indoc = "2.0.5"
 lazy_static = "1.5.0"
 serde = { version = "1.0.217", features = ["derive"] }
 toml = "0.8.19"
+walkdir = "2.5.0"

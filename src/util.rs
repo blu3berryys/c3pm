@@ -1,9 +1,10 @@
-use inflector::Inflector;
-use lazy_static::lazy_static;
 use crate::{
     generator::{configure_cmake_project, generate_project},
     model::{Generator, Language, ProjectConfig},
 };
+use inflector::Inflector;
+use lazy_static::lazy_static;
+use std::path::PathBuf;
 use std::{
     env::current_dir,
     fs,
@@ -169,6 +170,7 @@ pub fn move_built_object_files(
     current_dir: &String,
     build_dir: &String,
 ) -> Result<(), String> {
+    let valid_extensions = vec!["exe", "so", "dll", "pdb", "a", "o", "lib", "dylib"];
     let config_snake_case = config.to_string().to_pascal_case();
     let build_config_dir = Path::new(&build_dir);
     let target_dir = Path::new(&current_dir)
@@ -177,23 +179,20 @@ pub fn move_built_object_files(
 
     fs::create_dir_all(&target_dir).map_err(|e| e.to_string())?;
 
-    let mut moved_files = Vec::new();
+    let mut moved_files: Vec<PathBuf> = Vec::new();
 
-    if let Ok(entries) = fs::read_dir(build_config_dir) {
-        for entry in entries.filter_map(Result::ok) {
-            let file_name = entry.file_name();
-            if let Some(extension) = entry.path().extension() {
-                let valid_extensions = vec!["exe", "so", "dll", "pdb", "a", "o", "lib", "dylib"];
+    let entries = walkdir::WalkDir::new(build_dir.clone());
+    for entry in entries.into_iter().filter_map(|e| e.ok()) {
+        let file_name = entry.file_name();
+        if let Some(extension) = entry.clone().path().extension() {
+            if valid_extensions.contains(&extension.to_str().unwrap()) {
+                let source_path = entry.path();
+                let dest_path = target_dir.join(&file_name);
 
-                if valid_extensions.contains(&extension.to_str().unwrap()) {
-                    let source_path = entry.path();
-                    let dest_path = target_dir.join(file_name);
+                fs::rename(&source_path, &dest_path)
+                    .map_err(|e| format!("Failed to move file: {}", e))?;
 
-                    fs::rename(&source_path, &dest_path)
-                        .map_err(|e| format!("Failed to move file: {}", e))?;
-
-                    moved_files.push(dest_path);
-                }
+                moved_files.push(dest_path);
             }
         }
     }
