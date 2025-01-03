@@ -9,7 +9,6 @@
   <component name="ChangeListManager">
     <list default="true" id="109c83d0-ec7e-4aaf-838d-b4657583838e" name="Changes" comment="Add some deps that'll most likely be used later on :3">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/crates/aaaaaa/src/generator.rs" beforeDir="false" afterPath="$PROJECT_DIR$/crates/aaaaaa/src/generator.rs" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/crates/aaaaaa/src/impls.rs" beforeDir="false" afterPath="$PROJECT_DIR$/crates/aaaaaa/src/impls.rs" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/crates/aaaaaa/src/model.rs" beforeDir="false" afterPath="$PROJECT_DIR$/crates/aaaaaa/src/model.rs" afterDir="false" />
     </list>

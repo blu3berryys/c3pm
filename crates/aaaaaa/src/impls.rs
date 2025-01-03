@@ -272,7 +272,7 @@ impl Default for Project {
             name: String::new(),
             generator: None,
             language: Language::Cpp23,
-            compiler_settings: CompilerDetails {
+            compiler: CompilerDetails {
                 c_compiler: Some(compilers.0),
                 cxx_compiler: Some(compilers.1),
             }
@@ -354,7 +354,7 @@ impl ProjectConfig {
                 name: name.to_string(),
                 generator,
                 language,
-                compiler_settings: CompilerDetails {
+                compiler: CompilerDetails {
                     c_compiler: Some(compilers.0),
                     cxx_compiler: Some(compilers.1),
                 }

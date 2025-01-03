@@ -143,7 +143,7 @@ pub struct Project {
     pub name: String,
     pub generator: Option<Generator>,
     pub language: Language,
-    pub compiler_settings: CompilerDetails,
+    pub compiler: CompilerDetails,
 }
 
 #[derive(Serialize, Deserialize)]
