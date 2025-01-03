@@ -1,6 +1,6 @@
 use crate::model;
-use crate::model::{BuildConfig, Generator, Language, LanguageData, ProjectConfig, ProjectDetails};
-use clap::builder::{Str, ValueParser};
+use crate::model::{BuildConfig, Generator, Language, Project, ProjectConfig};
+use clap::builder::ValueParser;
 use std::collections::HashMap;
 use std::fmt::{Display, Formatter};
 use std::io::Error;
@@ -126,7 +126,7 @@ impl Display for BuildConfig {
 impl Display for Language {
     fn fmt(&self, f: &mut Formatter<'_>) -> std::fmt::Result {
         let str = match &self {
-            Language::C89 => "c89".to_string(),
+            //Language::C89 => "c89".to_string(),
             Language::C99 => "c99".to_string(),
             Language::C11 => "c11".to_string(),
             Language::C17 => "c17".to_string(),
@@ -148,7 +148,7 @@ impl FromStr for Language {
 
     fn from_str(s: &str) -> Result<Self, Self::Err> {
         match s.to_lowercase().trim() {
-            "c89" => Ok(Language::C89),
+            //"c89" => Ok(Language::C89),
             "c99" => Ok(Language::C99),
             "c11" => Ok(Language::C11),
             "c17" => Ok(Language::C17),
@@ -167,7 +167,7 @@ impl FromStr for Language {
 impl Language {
     pub fn get_lang_and_standard(&self) -> (String, String) {
         match self {
-            Language::C89 => ("C".to_string(), "89".to_string()),
+            //Language::C89 => ("C".to_string(), "89".to_string()),
             Language::C99 => ("C".to_string(), "99".to_string()),
             Language::C11 => ("C".to_string(), "11".to_string()),
             Language::C17 => ("C".to_string(), "17".to_string()),
@@ -183,7 +183,7 @@ impl Language {
 
     pub fn is_c(&self) -> bool {
         match self {
-            Language::C89 => true,
+            //Language::C89 => true,
             Language::C99 => true,
             Language::C11 => true,
             Language::C17 => true,
@@ -224,8 +224,8 @@ impl Into<ValueParser> for Generator {
     }
 }
 
-impl Default for ProjectDetails {
-    fn default() -> ProjectDetails {
+impl Default for Project {
+    fn default() -> Project {
         Self {
             name: String::new(),
             generator: None,
@@ -242,7 +242,7 @@ impl Default for ProjectConfig {
         dirs.insert("build".to_string(), "build/".to_string());
 
         Self {
-            project_details: ProjectDetails::default(),
+            project_details: Project::default(),
             dirs,
         }
     }
@@ -255,7 +255,7 @@ impl ProjectConfig {
 
     pub fn get_language(&self) -> &str {
         match self.project_details.language {
-            Language::C89 => "c",
+            //Language::C89 => "c",
             Language::C99 => "c",
             Language::C11 => "c",
             Language::C17 => "c",
@@ -303,7 +303,7 @@ impl ProjectConfig {
         dirs.insert("build".to_string(), build_dir.to_string());
 
         ProjectConfig {
-            project_details: ProjectDetails {
+            project_details: Project {
                 name: name.to_string(),
                 generator,
                 language,

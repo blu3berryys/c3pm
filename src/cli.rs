@@ -1,4 +1,4 @@
-use crate::model::{BuildConfig, Generator, Language};
+use crate::model::{Generator, Language};
 use crate::util::AVAILABLE_THREADS;
 use clap::{Parser, Subcommand};
 use std::str::FromStr;
@@ -7,7 +7,7 @@ use std::str::FromStr;
 pub struct C3pmArgs {
     /// Generate a new project :3
     #[command(subcommand)]
-    pub new_cmd: NewSubcmd,
+    pub subcommands: NewSubcmd,
 }
 
 #[derive(Subcommand, Debug)]
@@ -27,8 +27,10 @@ pub enum NewSubcmd {
         )]
         generator: Option<Generator>,
 
-        /// The language of the project (can either be "c", "cpp", "cxx", or "c++")
-        #[arg(short, long, value_parser=parse_language, default_value = "cpp")]
+        /// The language to use for the project (format the value as `{language (c/cpp)}{standard (valid standard num for language)})
+        ///
+        /// for example, `cpppm new example -l cpp14` would create a new c3pm project using C++14 in the directory `example`
+        #[arg(short, long, value_parser=parse_language, default_value = "cpp23")]
         language: Language,
 
         /// The name of the folder to generate the project in (defaults to the project name)
@@ -50,8 +52,10 @@ pub enum NewSubcmd {
         )]
         generator: Option<Generator>,
 
-        /// The language of the project (can either be "c", "cpp", "cxx", or "c++")
-        #[arg(short, long, value_parser=parse_language, default_value = "cpp", required = false)]
+        /// The language to use for the project (format the value as `{language (c/cpp)}{standard (valid standard num for language)})
+        /// 
+        /// for example, `cpppm init example -l c99` would initialize a new c3pm project using the C99 standard
+        #[arg(short, long, value_parser=parse_language, default_value = "cpp23", required = false)]
         language: Language,
     },
     /// Builds the c3pm project
@@ -62,7 +66,7 @@ pub enum NewSubcmd {
 
         /// The build config to use (e.g. Debug, RelWithDebInfo, Release)
         #[arg(short = 'c', long = "config", default_value = "RelWithDebInfo")]
-        config: BuildConfig,
+        config: String,
     },
 }
 
@@ -72,7 +76,7 @@ fn parse_language(lang: &str) -> Result<Language, String> {
     let language = Language::from_str(lang)?;
     let standard = input.get(1);
     let supported_langs = if language.is_c() {
-        vec!["c89", "c99", "c11", "c17", "c23"]
+        vec![/* "c89", */ "c99", "c11", "c17", "c23"]
     } else {
         vec!["cpp98", "cpp11", "cpp14", "cpp17", "cpp20", "cpp23"]
     };

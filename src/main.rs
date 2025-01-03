@@ -1,4 +1,4 @@
-#![allow(dead_code)]
+#![allow(dead_code, unused_variables)]
 
 use crate::cli::{C3pmArgs, NewSubcmd};
 use crate::util::get_current_path;
@@ -15,7 +15,7 @@ mod util;
 fn main() -> Result<(), String> {
     let args = C3pmArgs::parse();
 
-    match args.new_cmd {
+    match args.subcommands {
         NewSubcmd::New {
             name,
             generator,

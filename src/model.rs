@@ -4,17 +4,24 @@ use std::collections::HashMap;
 use std::fmt::Formatter;
 
 #[derive(Debug, Clone, Copy, Serialize, Deserialize)]
+#[serde(rename_all = "UPPERCASE")]
 pub enum Language {
-    C89,
+    //C89,
     C99,
     C11,
     C17,
     C23,
+    #[serde(rename = "C++98")]
     Cpp98,
+    #[serde(rename = "C++11")]
     Cpp11,
+    #[serde(rename = "C++14")]
     Cpp14,
+    #[serde(rename = "C++17")]
     Cpp17,
+    #[serde(rename = "C++20")]
     Cpp20,
+    #[serde(rename = "C++23")]
     Cpp23,
 }
 
@@ -120,7 +127,7 @@ pub fn parse_generator<T: Copy>(value: &str, pairs: &[(T, &'static str)]) -> Res
 
 #[derive(Serialize, Deserialize)]
 #[serde(rename_all = "kebab-case")]
-pub struct ProjectDetails {
+pub struct Project {
     pub name: String,
     pub generator: Option<Generator>,
     pub language: Language,
@@ -129,7 +136,7 @@ pub struct ProjectDetails {
 #[derive(Serialize, Deserialize)]
 #[serde(rename_all = "kebab-case")]
 pub struct ProjectConfig {
-    pub project_details: ProjectDetails,
+    pub project_details: Project,
     #[serde(default)]
     pub dirs: HashMap<String, String>,
 }

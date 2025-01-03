@@ -9,6 +9,8 @@
   <component name="ChangeListManager">
     <list default="true" id="109c83d0-ec7e-4aaf-838d-b4657583838e" name="Changes" comment="Add some deps that'll most likely be used later on :3">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Cargo.lock" beforeDir="false" afterPath="$PROJECT_DIR$/Cargo.lock" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Cargo.toml" beforeDir="false" afterPath="$PROJECT_DIR$/Cargo.toml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/cli.rs" beforeDir="false" afterPath="$PROJECT_DIR$/src/cli.rs" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/generator.rs" beforeDir="false" afterPath="$PROJECT_DIR$/src/generator.rs" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/impls.rs" beforeDir="false" afterPath="$PROJECT_DIR$/src/impls.rs" afterDir="false" />
@@ -38,6 +40,9 @@
   <component name="MacroExpansionManager">
     <option name="directoryName" value="J61hLzYl" />
   </component>
+  <component name="ProblemsViewState">
+    <option name="selectedTabId" value="CurrentFile" />
+  </component>
   <component name="ProjectColorInfo">{
   &quot;associatedIndex&quot;: 3
 }</component>
@@ -66,6 +71,7 @@
     "org.rust.cargo.project.model.impl.CargoExternalSystemProjectAware.subscribe.first.balloon": "",
     "org.rust.disableDetachedFileInspectionD:/Projects/petprojects/cppppm/src/config_parser.rs": "true",
     "org.rust.first.attach.projects": "true",
+    "run.code.analysis.last.selected.profile": "pProject Default",
     "settings.editor.selected.configurable": "inlay.hints",
     "vue.rearranger.settings.migration": "true"
   }
@@ -123,7 +129,7 @@
       <updated>1735684817008</updated>
       <workItem from="1735684817600" duration="784000" />
       <workItem from="1735685617307" duration="2128000" />
-      <workItem from="1735865194618" duration="11536000" />
+      <workItem from="1735865194618" duration="13403000" />
     </task>
     <task id="LOCAL-00001" summary="Add some deps that'll most likely be used later on :3">
       <option name="closed" value="true" />

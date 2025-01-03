@@ -77,20 +77,6 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "b048fb63fd8b5923fc5aa7b340d8e156aec7ec02f0c78fa8a6ddc2613f6f71de"
 
 [[package]]
-name = "c3pm"
-version = "0.1.0"
-dependencies = [
- "Inflector",
- "cfg-if",
- "clap",
- "git2",
- "indoc",
- "lazy_static",
- "serde",
- "toml",
-]
-
-[[package]]
 name = "cc"
 version = "1.2.6"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -100,12 +86,6 @@ dependencies = [
  "libc",
  "shlex",
 ]
-
-[[package]]
-name = "cfg-if"
-version = "1.0.0"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "baf1de4339761588bc0619e3cbc0120ee582ebb74b53b4efbf79117bd2da40fd"
 
 [[package]]
 name = "clap"
@@ -152,6 +132,19 @@ name = "colorchoice"
 version = "1.0.3"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "5b63caa9aa9397e2d9480a9b13673856c78d8ac123288526c37d7839f2a86990"
+
+[[package]]
+name = "cpppm"
+version = "0.1.0"
+dependencies = [
+ "Inflector",
+ "clap",
+ "git2",
+ "indoc",
+ "lazy_static",
+ "serde",
+ "toml",
+]
 
 [[package]]
 name = "displaydoc"

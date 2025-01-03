@@ -81,12 +81,96 @@ pub fn generate_project(
     let cmakelists_path = format!("{path}/CMakeLists.txt");
     let mut cmakelists_file = File::create(cmakelists_path)?;
 
-    match lang.is_c() {
-        true => {
-            init_c_project(&project_name, &src_path, lang, &include_path, &mut cmakelists_file)?;
+    match lang {
+        Language::C99 => {
+            init_c_project(
+                &project_name,
+                &src_path,
+                lang,
+                &include_path,
+                &mut cmakelists_file,
+            )?;
         }
-        false => {
-            init_cpp_project(&project_name, lang, include_path, src_path, &mut cmakelists_file)?;
+        Language::C11 => {
+            init_c_project(
+                &project_name,
+                &src_path,
+                lang,
+                &include_path,
+                &mut cmakelists_file,
+            )?;
+        }
+        Language::C17 => {
+            init_c_project(
+                &project_name,
+                &src_path,
+                lang,
+                &include_path,
+                &mut cmakelists_file,
+            )?;
+        }
+        Language::C23 => {
+            init_c_project(
+                &project_name,
+                &src_path,
+                lang,
+                &include_path,
+                &mut cmakelists_file,
+            )?;
+        }
+        Language::Cpp98 => {
+            init_cpp_project(
+                &project_name,
+                lang,
+                src_path,
+                include_path,
+                &mut cmakelists_file,
+            )?;
+        }
+        Language::Cpp11 => {
+            init_cpp_project(
+                &project_name,
+                lang,
+                src_path,
+                include_path,
+                &mut cmakelists_file,
+            )?;
+        }
+        Language::Cpp14 => {
+            init_cpp_project(
+                &project_name,
+                lang,
+                src_path,
+                include_path,
+                &mut cmakelists_file,
+            )?;
+        }
+        Language::Cpp17 => {
+            init_cpp_project(
+                &project_name,
+                lang,
+                src_path,
+                include_path,
+                &mut cmakelists_file,
+            )?;
+        }
+        Language::Cpp20 => {
+            init_cpp_project(
+                &project_name,
+                lang,
+                src_path,
+                include_path,
+                &mut cmakelists_file,
+            )?;
+        }
+        Language::Cpp23 => {
+            init_cpp_project(
+                &project_name,
+                lang,
+                src_path,
+                include_path,
+                &mut cmakelists_file,
+            )?;
         }
     }
 
@@ -198,7 +282,10 @@ pub fn configure_cmake_project(
 fn get_c_cmakelists(project_name: &String, standard: Language) -> String {
     get_common_cmakelists(
         project_name,
-        format!("set(CMAKE_C_STANDARD {})", standard.get_lang_and_standard().1),
+        format!(
+            "set(CMAKE_C_STANDARD {})",
+            standard.get_lang_and_standard().1
+        ),
         "SOURCES",
         "HEADERS",
     )
@@ -207,7 +294,10 @@ fn get_c_cmakelists(project_name: &String, standard: Language) -> String {
 fn get_cpp_cmakelists(project_name: &String, language: Language) -> String {
     get_common_cmakelists(
         project_name,
-        format!("set(CMAKE_CXX_STANDARD {})", language.get_lang_and_standard().1),
+        format!(
+            "set(CMAKE_CXX_STANDARD {})",
+            language.get_lang_and_standard().1
+        ),
         "SOURCES",
         "HEADERS",
     )

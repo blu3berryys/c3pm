@@ -1,13 +1,19 @@
-use crate::generator::{configure_cmake_project, generate_project};
-use crate::model::{BuildConfig, Generator, Language, ProjectConfig};
 use inflector::Inflector;
 use lazy_static::lazy_static;
-use std::env::current_dir;
-use std::io::{Error, ErrorKind};
-use std::path::Path;
-use std::process::Command;
-use std::{fs, io, thread};
-use std::fs::read_to_string;
+use crate::{
+    generator::{configure_cmake_project, generate_project},
+    model::{Generator, Language, ProjectConfig},
+};
+use std::{
+    env::current_dir,
+    fs,
+    fs::read_to_string,
+    io,
+    io::{Error, ErrorKind},
+    path::Path,
+    process::Command,
+    thread,
+};
 
 lazy_static! {
     pub static ref AVAILABLE_THREADS: usize = {
@@ -65,7 +71,7 @@ pub fn get_cmake_version() -> Result<String, Error> {
 
 pub fn is_c3pm_project(path: &str) -> io::Result<bool> {
     let c3pm_project_base_files: Vec<String> = vec![
-        "c3pm.toml".to_string(),
+        ".cpppm.toml".to_string(),
         "CMakeLists.txt".to_string(),
         "src".to_string(),
         ".git".to_string(),
@@ -119,9 +125,13 @@ pub fn create_new_project(
     Ok(Ok(()))
 }
 
-pub fn build_project(jobs: &usize, config: &BuildConfig, generator: Option<Generator>) -> Result<(), String> {
+pub fn build_project(
+    jobs: &usize,
+    config: &String,
+    generator: Option<Generator>,
+) -> Result<(), String> {
     let current_dir = get_current_path().map_err(|e| e.to_string())?;
-    let config_path = Path::new(&current_dir).join(".c3pm.toml");
+    let config_path = Path::new(&current_dir).join(".cpppm.toml");
 
     configure_cmake_project(&current_dir, generator).expect("Failed to configure cmake project");
 
@@ -149,13 +159,13 @@ pub fn build_project(jobs: &usize, config: &BuildConfig, generator: Option<Gener
 
     println!("{}", String::from_utf8_lossy(&output.stdout));
 
-    move_built_object_files(config, &current_dir, &build_dir)?;
+    move_built_object_files(config, &current_dir, &build_dir_str.to_string())?;
 
     Ok(())
 }
 
 pub fn move_built_object_files(
-    config: &BuildConfig,
+    config: &String,
     current_dir: &String,
     build_dir: &String,
 ) -> Result<(), String> {
