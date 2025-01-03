@@ -1,17 +1,19 @@
+use crate::config_parser::load_project_config;
+use crate::generator::{configure_cmake_project, generate_project};
+use crate::model::{BuildConfig, Generator, Language};
+use inflector::Inflector;
+use lazy_static::lazy_static;
 use std::env::current_dir;
 use std::io::{Error, ErrorKind};
 use std::path::Path;
 use std::process::Command;
 use std::{fs, io, thread};
-use lazy_static::lazy_static;
-use inflector::Inflector;
-use crate::config_parser::load_project_config;
-use crate::generator::{configure_cmake_project, generate_project};
-use crate::model::{BuildConfig, Language};
 
 lazy_static! {
     pub static ref AVAILABLE_THREADS: usize = {
-        thread::available_parallelism().map(|n| n.get()).unwrap_or(1)
+        thread::available_parallelism()
+            .map(|n| n.get())
+            .unwrap_or(1)
     };
 }
 
@@ -93,7 +95,12 @@ pub fn dir_has_entries(directory: &str, entries: Vec<String>) -> Result<bool, Er
     Ok(true)
 }
 
-pub fn create_new_project(name: String, language: Language, folder: Option<String>) -> Result<Result<(), String>, String> {
+pub fn create_new_project(
+    name: String,
+    generator: Option<Generator>,
+    language: Language,
+    folder: Option<String>,
+) -> Result<Result<(), String>, String> {
     let folder_name = match folder {
         Some(folder) => folder,
         None => name.clone(),
@@ -102,16 +109,21 @@ pub fn create_new_project(name: String, language: Language, folder: Option<Strin
     let current_dir = get_current_path().map_err(|e| e.to_string())?;
     let dir = create_dir(&current_dir, &folder_name).map_err(|e| e.to_string())?;
 
-    generate_project(dir, name, language).map_err(|e| e.to_string())?;
+    match generator {
+        Some(generator) => {
+            generate_project(dir, name, Some(generator), language).map_err(|e| e.to_string())?;
+        }
+        None => generate_project(dir, name, None, language).map_err(|e| e.to_string())?,
+    }
 
     Ok(Ok(()))
 }
 
-pub fn build_project(jobs: &usize, config: &BuildConfig) -> Result<(), String> {
+pub fn build_project(jobs: &usize, config: &BuildConfig, generator: Option<Generator>) -> Result<(), String> {
     let current_dir = get_current_path().map_err(|e| e.to_string())?;
     let config_path = Path::new(&current_dir).join(".c3pm.toml");
 
-    configure_cmake_project(&current_dir).expect("Failed to configure cmake project");
+    configure_cmake_project(&current_dir, generator).expect("Failed to configure cmake project");
 
     let project_config = load_project_config(&config_path)?;
     let build_dir = project_config
@@ -142,10 +154,16 @@ pub fn build_project(jobs: &usize, config: &BuildConfig) -> Result<(), String> {
     Ok(())
 }
 
-pub fn move_built_object_files(config: &BuildConfig, current_dir: &String, build_dir: &String) -> Result<(), String> {
+pub fn move_built_object_files(
+    config: &BuildConfig,
+    current_dir: &String,
+    build_dir: &String,
+) -> Result<(), String> {
     let config_snake_case = config.to_string().to_snake_case();
     let build_config_dir = Path::new(&build_dir).join(config.to_string());
-    let target_dir = Path::new(&current_dir).join("target").join(config_snake_case);
+    let target_dir = Path::new(&current_dir)
+        .join("target")
+        .join(config_snake_case);
 
     fs::create_dir_all(&target_dir).map_err(|e| e.to_string())?;
 
@@ -155,9 +173,7 @@ pub fn move_built_object_files(config: &BuildConfig, current_dir: &String, build
         for entry in entries.filter_map(Result::ok) {
             let file_name = entry.file_name();
             if let Some(extension) = entry.path().extension() {
-                let valid_extensions = vec![
-                    "exe", "so", "dll", "pdb", "a", "o", "lib", "dylib",
-                ];
+                let valid_extensions = vec!["exe", "so", "dll", "pdb", "a", "o", "lib", "dylib"];
 
                 if valid_extensions.contains(&extension.to_str().unwrap()) {
                     let source_path = entry.path();
@@ -179,6 +195,6 @@ pub fn move_built_object_files(config: &BuildConfig, current_dir: &String, build
     for moved_file in moved_files {
         println!("Moved file: {}", moved_file.display());
     }
-    
+
     Ok(())
 }

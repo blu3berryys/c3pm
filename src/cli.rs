@@ -1,5 +1,5 @@
+use crate::model::{BuildConfig, CStandard, CppStandard, Generator, Language};
 use crate::util::AVAILABLE_THREADS;
-use crate::model::{BuildConfig, CStandard, CppStandard, Language};
 use clap::{Parser, Subcommand};
 
 #[derive(Parser, Debug)]
@@ -16,6 +16,10 @@ pub enum NewSubcmd {
         /// The name of the project to generate
         name: String,
 
+        /// The generator to use
+        #[arg(short, long, required = false, help = "The name of the generator to use (use this flag without an argument for a list of possible values)", hide_possible_values = true)]
+        generator: Option<Generator>,
+
         /// The language of the project (can either be "c", "cpp", "cxx", or "c++")
         #[arg(short, long, value_parser=parse_language, default_value = "cpp")]
         language: Language,
@@ -29,8 +33,12 @@ pub enum NewSubcmd {
         /// The name of the project to initialize (defaults to the name of the current directory)
         name: Option<String>,
 
+        /// The generator to use
+        #[arg(short, long, required = false, help = "The name of the generator to use (use this flag without an argument for a list of possible values)", hide_possible_values = true)]
+        generator: Option<Generator>,
+
         /// The language of the project (can either be "c", "cpp", "cxx", or "c++")
-        #[arg(short, long, value_parser=parse_language, default_value = "cpp")]
+        #[arg(short, long, value_parser=parse_language, default_value = "cpp", required = false)]
         language: Language,
     },
     /// Builds the c3pm project
@@ -40,7 +48,7 @@ pub enum NewSubcmd {
         jobs: usize,
 
         /// The build config to use (e.g. Debug, RelWithDebInfo, Release)
-        #[arg(short = 'c', long = "config", default_value = "RelWithDebInfo", value_parser=parse_build_config)]
+        #[arg(short = 'c', long = "config", default_value = "RelWithDebInfo")]
         config: BuildConfig,
     },
 }
@@ -66,29 +74,6 @@ fn parse_language(lang: &str) -> Result<Language, String> {
     let formatted_possible_values = supported_langs.join(", ");
     Err(format!(
         "Possible values are {:?}",
-        formatted_possible_values
-    ))
-}
-
-fn parse_build_config(config: &str) -> Result<BuildConfig, String> {
-    let supported_configs = ["Debug", "RelWithDebInfo", "Release", "MinSizeRel"];
-
-    let config_str = format!("{}", config);
-
-    if supported_configs[1..].contains(&config_str.as_str()) {
-        return match config_str.as_str() {
-            "RelWithDebInfo" => Ok(BuildConfig::RelWithDebInfo),
-            "Release" => Ok(BuildConfig::Release),
-            "MinSizeRel" => Ok(BuildConfig::MinSizeRel),
-            "Debug" => Ok(BuildConfig::Debug),
-            &_ => Ok(BuildConfig::RelWithDebInfo),
-        }
-    }
-
-    let formatted_possible_values = supported_configs.join(", ");
-
-    Err(format!(
-        "Possible values are: {}",
         formatted_possible_values
     ))
 }

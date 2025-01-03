@@ -1,7 +1,5 @@
-use crate::{
-    model::Language,
-    model::CppStandard::Cpp23
-};
+use crate::model::Generator;
+use crate::{model::CppStandard::Cpp23, model::Language};
 use serde::{Deserialize, Serialize};
 use std::collections::HashMap;
 use std::fs;
@@ -9,11 +7,29 @@ use std::io::Error;
 use std::path::Path;
 
 #[derive(Serialize, Deserialize)]
-pub struct ProjectConfig {
+#[serde(rename_all = "kebab-case")]
+pub struct ProjectDetails {
     pub name: String,
-    pub language: Language,
+    pub generator: Option<Generator>,
+    pub language: Language
+}
+
+#[derive(Serialize, Deserialize)]
+#[serde(rename_all = "kebab-case")]
+pub struct ProjectConfig {
+    pub project_details: ProjectDetails,
     #[serde(default)]
     pub dirs: HashMap<String, String>,
+}
+
+impl Default for ProjectDetails {
+    fn default() -> ProjectDetails {
+        Self {
+            name: String::new(),
+            generator: None,
+            language: Language::CPP(Cpp23)
+        }
+    }
 }
 
 impl Default for ProjectConfig {
@@ -24,20 +40,19 @@ impl Default for ProjectConfig {
         dirs.insert("build".to_string(), "build/".to_string());
 
         Self {
-            name: String::new(),
-            language: Language::CPP(Cpp23),
-            dirs
+            project_details: ProjectDetails::default(),
+            dirs,
         }
     }
 }
 
 impl ProjectConfig {
     pub fn get_name(&self) -> &str {
-        &self.name
+        &self.project_details.name
     }
 
     pub fn get_language(&self) -> &str {
-        match self.language {
+        match self.project_details.language {
             Language::CPP(_) => "cpp",
             Language::C(_) => "c",
         }
@@ -58,16 +73,26 @@ impl ProjectConfig {
     pub fn get_build_dir(&self) -> Option<String> {
         self.dirs.get("build").cloned()
     }
+    
+    pub fn get_generator(&self) -> Option<String> {
+        Some(self.project_details.generator?.to_string())
+    }
 
-    pub fn create_new_config(name: &str, language: Language, sources_dir: &str, headers_dir: &str, build_dir: &str) -> ProjectConfig {
+    pub fn create_new_config(
+        name: &str,
+        generator: Option<Generator>,
+        language: Language,
+        sources_dir: &str,
+        headers_dir: &str,
+        build_dir: &str,
+    ) -> ProjectConfig {
         let mut dirs = HashMap::new();
         dirs.insert("sources".to_string(), sources_dir.to_string());
         dirs.insert("headers".to_string(), headers_dir.to_string());
         dirs.insert("build".to_string(), build_dir.to_string());
-
+        
         ProjectConfig {
-            name: name.to_string(),
-            language,
+            project_details: ProjectDetails { name: name.to_string(), generator, language },
             dirs,
         }
     }
@@ -89,9 +114,8 @@ pub fn load_project_config(config_path: &Path) -> Result<ProjectConfig, String> 
         ));
     }
 
-    let config_contents = fs::read_to_string(config_path)
-        .map_err(|e| format!("Error reading config file: {}", e))?;
+    let config_contents =
+        fs::read_to_string(config_path).map_err(|e| format!("Error reading config file: {}", e))?;
 
-    toml::de::from_str(&config_contents)
-        .map_err(|e| format!("Error parsing config file: {}", e))
+    toml::de::from_str(&config_contents).map_err(|e| format!("Error parsing config file: {}", e))
 }

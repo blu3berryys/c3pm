@@ -1,5 +1,5 @@
 use crate::config_parser::ProjectConfig;
-use crate::model::{CStandard, CppStandard, Language};
+use crate::model::{CStandard, CppStandard, Generator, Language};
 use crate::util::get_cmake_version;
 use git2::Repository;
 use indoc::{formatdoc, indoc};
@@ -70,6 +70,7 @@ void example_function() {
 pub fn generate_project(
     path: String,
     project_name: String,
+    generator: Option<Generator>,
     lang: Language,
 ) -> Result<(), Error> {
     let src_path = format!("{}/src", path);
@@ -113,7 +114,20 @@ pub fn generate_project(
         }
     }
 
-    let config = ProjectConfig::create_new_config(&project_name, lang, "src", "include", "build");
+    let config = match generator {
+        Some(generator) => ProjectConfig::create_new_config(
+            &project_name,
+            Some(generator),
+            lang,
+            "src",
+            "include",
+            "build",
+        ),
+        None => {
+            ProjectConfig::create_new_config(&project_name, None, lang, "src", "include", "build")
+        }
+    };
+
     let config_path = format!("{}/.c3pm.toml", path);
     let mut config_file = File::create(config_path)?;
     config_file.write_all(ProjectConfig::serialize_config(&config)?.as_bytes())?;
@@ -122,7 +136,7 @@ pub fn generate_project(
         eprintln!("Failed to initialize git repository: {}", e);
     }
 
-    let cmake_status = configure_cmake_project(&path);
+    let cmake_status = configure_cmake_project(&path, generator);
 
     if let Err(e) = cmake_status {
         eprintln!("Failed to configure CMake project: {}", e);
@@ -135,13 +149,27 @@ pub fn generate_project(
     Ok(())
 }
 
-pub fn configure_cmake_project(path: &String) -> Result<ExitStatus, Error> {
-    let cmake_status = Command::new("cmake")
-        .arg("-S")
-        .arg(&path)
-        .arg("-B")
-        .arg(format!("{}/build", path))
-        .status();
+pub fn configure_cmake_project(
+    path: &String,
+    generator: Option<Generator>,
+) -> Result<ExitStatus, Error> {
+    let cmake_status = if generator.is_some() {
+        Command::new("cmake")
+            .arg("-S")
+            .arg(&path)
+            .arg("-B")
+            .arg(format!("{}/build", path))
+            .arg("-G")
+            .arg(generator.unwrap().to_string())
+            .status()
+    } else {
+        Command::new("cmake")
+            .arg("-S")
+            .arg(&path)
+            .arg("-B")
+            .arg(format!("{}/build", path))
+            .status()
+    };
     cmake_status
 }
 
