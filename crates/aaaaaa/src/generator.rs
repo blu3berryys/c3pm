@@ -302,8 +302,8 @@ fn get_c_cmakelists(project_name: &String, standard: Language) -> String {
             "set(CMAKE_C_STANDARD {})",
             standard.get_lang_and_standard().1
         ),
-        "SOURCES",
-        "HEADERS",
+        "SRC",
+        "INCLUDE",
     )
 }
 
@@ -314,8 +314,8 @@ fn get_cpp_cmakelists(project_name: &String, language: Language) -> String {
             "set(CMAKE_CXX_STANDARD {})",
             language.get_lang_and_standard().1
         ),
-        "SOURCES",
-        "HEADERS",
+        "SRC",
+        "INCLUDE",
     )
 }
 
@@ -339,13 +339,12 @@ fn get_common_cmakelists<Env: Display>(
         project({project_name})
 
         {env}
-
         set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 
         file(GLOB_RECURSE {sources_var} CONFIGURE_DEPENDS "src/*.c" "src/*.cpp")
         file(GLOB_RECURSE {headers_var} CONFIGURE_DEPENDS "include/*.h" "include/*.hpp")
 
         add_executable({project_name} ${{{sources_var}}})
-        target_include_directories({project_name} PRIVATE include)
+        target_include_directories({project_name} PUBLIC include)
     "#}
 }

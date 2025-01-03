@@ -1,4 +1,4 @@
-use crate::model;
+use crate::{model, select_compilers};
 use crate::model::{
     BuildConfig, Dependency, DependencyData, Generator, Language, Project, ProjectConfig,
 };
@@ -264,10 +264,14 @@ impl Into<ValueParser> for Generator {
 
 impl Default for Project {
     fn default() -> Project {
+        let compilers = select_compilers();
+        
         Self {
             name: String::new(),
             generator: None,
             language: Language::Cpp23,
+            c_compiler: Some(compilers.0),
+            cxx_compiler: Some(compilers.1),
         }
     }
 }
@@ -336,6 +340,7 @@ impl ProjectConfig {
         build_dir: &str,
     ) -> ProjectConfig {
         let mut dirs = HashMap::new();
+        let compilers = select_compilers();
         dirs.insert("sources".to_string(), sources_dir.to_string());
         dirs.insert("headers".to_string(), headers_dir.to_string());
         dirs.insert("build".to_string(), build_dir.to_string());
@@ -345,6 +350,8 @@ impl ProjectConfig {
                 name: name.to_string(),
                 generator,
                 language,
+                c_compiler: Some(compilers.0),
+                cxx_compiler: Some(compilers.1),
             },
             dirs,
             dependencies: None,

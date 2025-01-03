@@ -1,7 +1,11 @@
+use crate::generator::{configure_cmake_project, generate_project};
+use crate::model::Generator;
 use crate::model::{Language, ProjectConfig};
 use inflector::Inflector;
 use lazy_static::lazy_static;
 use std::path::PathBuf;
+use std::process::Command as ACommand;
+use std::str::FromStr;
 use std::{
     env::current_dir,
     fs,
@@ -12,13 +16,10 @@ use std::{
     process::Command,
     thread,
 };
-use std::str::FromStr;
-use crate::generator::{configure_cmake_project, generate_project};
-use crate::model::Generator;
 
-pub mod model;
 pub mod generator;
 pub mod impls;
+pub mod model;
 
 lazy_static! {
     pub static ref AVAILABLE_THREADS: usize = {
@@ -243,7 +244,11 @@ pub fn load_project_config(cfg_path: &Path) -> Result<ProjectConfig, String> {
     toml::de::from_str(&cfg_str).map_err(|e| format!("Error parsing config file: {}", e))
 }
 
-pub fn init_project_subcommand(name: Option<String>, generator: Option<Generator>, language: Language) -> Result<(), String> {
+pub fn init_project_subcommand(
+    name: Option<String>,
+    generator: Option<Generator>,
+    language: Language,
+) -> Result<(), String> {
     let current_dir =
         PathBuf::from_str(get_current_path().map_err(|e| e.to_string())?.as_str()).unwrap();
 
@@ -273,7 +278,7 @@ pub fn reconfigure_project_subcommand(generator: Option<Generator>) {
         Some(gen) => configure_cmake_project(&get_current_path().expect("fuck"), Some(gen)),
         None => configure_cmake_project(&get_current_path().unwrap(), None),
     }
-        .expect("owo");
+    .expect("owo");
 }
 
 pub fn parse_language(lang: &str) -> Result<Language, String> {
@@ -304,4 +309,18 @@ pub fn parse_language(lang: &str) -> Result<Language, String> {
         "Possible values are {:?}",
         formatted_possible_values
     ))
+}
+
+fn is_cmd_success(cmd: &str) -> bool {
+    ACommand::new(cmd).output().is_ok()
+}
+
+pub fn select_compilers() -> (String, String) {
+    if is_cmd_success("clang") && is_cmd_success("clang++") {
+        ("clang".to_string(), "clang++".to_string())
+    } else if is_cmd_success("gcc") && is_cmd_success("g++") {
+        ("gcc".to_string(), "g++".to_string())
+    } else {
+        (String::new(), String::new())
+    }
 }
