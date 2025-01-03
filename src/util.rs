@@ -169,8 +169,8 @@ pub fn move_built_object_files(
     current_dir: &String,
     build_dir: &String,
 ) -> Result<(), String> {
-    let config_snake_case = config.to_string().to_snake_case();
-    let build_config_dir = Path::new(&build_dir).join(config.to_string());
+    let config_snake_case = config.to_string().to_pascal_case();
+    let build_config_dir = Path::new(&build_dir);
     let target_dir = Path::new(&current_dir)
         .join("target")
         .join(config_snake_case);
