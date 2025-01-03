@@ -1,6 +1,5 @@
-use crate::config_parser::load_project_config;
 use crate::generator::{configure_cmake_project, generate_project};
-use crate::model::{BuildConfig, Generator, Language};
+use crate::model::{BuildConfig, Generator, Language, ProjectConfig};
 use inflector::Inflector;
 use lazy_static::lazy_static;
 use std::env::current_dir;
@@ -8,6 +7,7 @@ use std::io::{Error, ErrorKind};
 use std::path::Path;
 use std::process::Command;
 use std::{fs, io, thread};
+use std::fs::read_to_string;
 
 lazy_static! {
     pub static ref AVAILABLE_THREADS: usize = {
@@ -197,4 +197,13 @@ pub fn move_built_object_files(
     }
 
     Ok(())
+}
+
+pub fn load_project_config(cfg_path: &Path) -> Result<ProjectConfig, String> {
+    if !cfg_path.exists() {
+        return Err(format!("Config not found at {}", cfg_path.display()));
+    }
+
+    let cfg_str = read_to_string(cfg_path).map_err(|e| format!("Error reading config: {}", e))?;
+    toml::de::from_str(&cfg_str).map_err(|e| format!("Error parsing config file: {}", e))
 }

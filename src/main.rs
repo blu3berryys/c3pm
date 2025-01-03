@@ -6,10 +6,10 @@ use clap::Parser;
 use std::path::PathBuf;
 use std::str::FromStr;
 mod cli;
-mod config_parser;
 mod generator;
 mod model;
 mod util;
+mod impls;
 
 fn main() -> Result<(), String> {
     let args = C3pmArgs::parse();

@@ -1,4 +1,4 @@
-use crate::config_parser::ProjectConfig;
+use crate::model::ProjectConfig;
 use crate::model::{CStandard, CppStandard, Generator, Language};
 use crate::util::get_cmake_version;
 use git2::Repository;
@@ -128,7 +128,7 @@ pub fn generate_project(
         }
     };
 
-    let config_path = format!("{}/.c3pm.toml", path);
+    let config_path = format!("{}/.cpppm.toml", path);
     let mut config_file = File::create(config_path)?;
     config_file.write_all(ProjectConfig::serialize_config(&config)?.as_bytes())?;
 

@@ -8,12 +8,11 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="109c83d0-ec7e-4aaf-838d-b4657583838e" name="Changes" comment="Add some deps that'll most likely be used later on :3">
-      <change beforePath="$PROJECT_DIR$/.idea/vcs.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/vcs.xml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/impls.rs" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Cargo.lock" beforeDir="false" afterPath="$PROJECT_DIR$/Cargo.lock" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Cargo.toml" beforeDir="false" afterPath="$PROJECT_DIR$/Cargo.toml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/cli.rs" beforeDir="false" afterPath="$PROJECT_DIR$/src/cli.rs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/config_parser.rs" beforeDir="false" afterPath="$PROJECT_DIR$/src/config_parser.rs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/config_parser.rs" beforeDir="false" />
       <change beforePath="$PROJECT_DIR$/src/generator.rs" beforeDir="false" afterPath="$PROJECT_DIR$/src/generator.rs" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/main.rs" beforeDir="false" afterPath="$PROJECT_DIR$/src/main.rs" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/model.rs" beforeDir="false" afterPath="$PROJECT_DIR$/src/model.rs" afterDir="false" />
@@ -34,6 +33,9 @@
   </component>
   <component name="Git.Settings">
     <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
+  </component>
+  <component name="HighlightingSettingsPerFile">
+    <setting file="file://$USER_HOME$/scoop/persist/rustup/.cargo/registry/src/index.crates.io-6f17d22bba15001f/serde_derive-1.0.217/src/lib.rs" root0="FORCE_HIGHLIGHTING" />
   </component>
   <component name="MacroExpansionManager">
     <option name="directoryName" value="J61hLzYl" />
@@ -123,7 +125,7 @@
       <updated>1735684817008</updated>
       <workItem from="1735684817600" duration="784000" />
       <workItem from="1735685617307" duration="2128000" />
-      <workItem from="1735865194618" duration="7471000" />
+      <workItem from="1735865194618" duration="9332000" />
     </task>
     <task id="LOCAL-00001" summary="Add some deps that'll most likely be used later on :3">
       <option name="closed" value="true" />
