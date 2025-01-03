@@ -1,8 +1,6 @@
 use crate::model;
-use crate::model::{
-    BuildConfig, CStandard, CppStandard, Generator, Language, ProjectConfig, ProjectDetails,
-};
-use clap::builder::ValueParser;
+use crate::model::{BuildConfig, Generator, Language, LanguageData, ProjectConfig, ProjectDetails};
+use clap::builder::{Str, ValueParser};
 use std::collections::HashMap;
 use std::fmt::{Display, Formatter};
 use std::io::Error;
@@ -125,76 +123,78 @@ impl Display for BuildConfig {
     }
 }
 
-impl TryFrom<&str> for CStandard {
-    type Error = String;
-
-    fn try_from(value: &str) -> Result<Self, Self::Error> {
-        model::parse_standard(
-            value,
-            &[
-                (Self::C89, "89"),
-                (Self::C89, "90"),
-                (Self::C99, "99"),
-                (Self::C11, "11"),
-                (Self::C17, "17"),
-                (Self::C23, "23"),
-            ],
-        )
-    }
-}
-
-impl Display for CStandard {
-    fn fmt(&self, f: &mut Formatter<'_>) -> std::fmt::Result {
-        let str = match self {
-            CStandard::C89 => "90",
-            CStandard::C99 => "99",
-            CStandard::C11 => "11",
-            CStandard::C17 => "17",
-            CStandard::C23 => "23",
-        };
-        write!(f, "{str}")
-    }
-}
-
-impl TryFrom<&str> for CppStandard {
-    type Error = String;
-
-    fn try_from(value: &str) -> Result<Self, Self::Error> {
-        model::parse_standard::<CppStandard>(
-            value,
-            &[
-                (Self::Cpp98, "98"),
-                (Self::Cpp11, "11"),
-                (Self::Cpp14, "14"),
-                (Self::Cpp17, "17"),
-                (Self::Cpp20, "20"),
-                (Self::Cpp23, "23"),
-            ],
-        )
-    }
-}
-
-impl Display for CppStandard {
-    fn fmt(&self, f: &mut Formatter<'_>) -> std::fmt::Result {
-        let str = match self {
-            CppStandard::Cpp98 => "98",
-            CppStandard::Cpp11 => "11",
-            CppStandard::Cpp14 => "14",
-            CppStandard::Cpp17 => "17",
-            CppStandard::Cpp20 => "20",
-            CppStandard::Cpp23 => "23",
-        };
-        write!(f, "{str}")
-    }
-}
-
 impl Display for Language {
     fn fmt(&self, f: &mut Formatter<'_>) -> std::fmt::Result {
         let str = match &self {
-            Language::C(_) => "c".to_string(),
-            Language::CPP(_) => "c++".to_string(),
+            Language::C89 => "c89".to_string(),
+            Language::C99 => "c99".to_string(),
+            Language::C11 => "c11".to_string(),
+            Language::C17 => "c17".to_string(),
+            Language::C23 => "c23".to_string(),
+            Language::Cpp98 => "cpp98".to_string(),
+            Language::Cpp11 => "cpp11".to_string(),
+            Language::Cpp14 => "cpp14".to_string(),
+            Language::Cpp17 => "cpp17".to_string(),
+            Language::Cpp20 => "cpp20".to_string(),
+            Language::Cpp23 => "cpp23".to_string(),
         };
+
         write!(f, "{}", str)
+    }
+}
+
+impl FromStr for Language {
+    type Err = String;
+
+    fn from_str(s: &str) -> Result<Self, Self::Err> {
+        match s.to_lowercase().trim() {
+            "c89" => Ok(Language::C89),
+            "c99" => Ok(Language::C99),
+            "c11" => Ok(Language::C11),
+            "c17" => Ok(Language::C17),
+            "c23" => Ok(Language::C23),
+            "cpp98" => Ok(Language::Cpp98),
+            "cpp11" => Ok(Language::Cpp11),
+            "cpp14" => Ok(Language::Cpp14),
+            "cpp17" => Ok(Language::Cpp17),
+            "cpp20" => Ok(Language::Cpp20),
+            "cpp23" => Ok(Language::Cpp23),
+            _ => Err(format!("Unknown language: {}", s)),
+        }
+    }
+}
+
+impl Language {
+    pub fn get_lang_and_standard(&self) -> (String, String) {
+        match self {
+            Language::C89 => ("C".to_string(), "89".to_string()),
+            Language::C99 => ("C".to_string(), "99".to_string()),
+            Language::C11 => ("C".to_string(), "11".to_string()),
+            Language::C17 => ("C".to_string(), "17".to_string()),
+            Language::C23 => ("C".to_string(), "23".to_string()),
+            Language::Cpp98 => ("C++".to_string(), "98".to_string()),
+            Language::Cpp11 => ("C++".to_string(), "11".to_string()),
+            Language::Cpp14 => ("C++".to_string(), "14".to_string()),
+            Language::Cpp17 => ("C++".to_string(), "17".to_string()),
+            Language::Cpp20 => ("C++".to_string(), "20".to_string()),
+            Language::Cpp23 => ("C++".to_string(), "23".to_string()),
+        }
+    }
+
+    pub fn is_c(&self) -> bool {
+        match self {
+            Language::C89 => true,
+            Language::C99 => true,
+            Language::C11 => true,
+            Language::C17 => true,
+            Language::C23 => true,
+            Language::Cpp98 => false,
+            Language::Cpp11 => false,
+            Language::Cpp14 => false,
+            Language::Cpp17 => false,
+            Language::Cpp20 => false,
+            Language::Cpp23 => false,
+        }
     }
 }
 
@@ -229,7 +229,7 @@ impl Default for ProjectDetails {
         Self {
             name: String::new(),
             generator: None,
-            language: Language::CPP(CppStandard::Cpp23),
+            language: Language::Cpp23,
         }
     }
 }
@@ -255,8 +255,17 @@ impl ProjectConfig {
 
     pub fn get_language(&self) -> &str {
         match self.project_details.language {
-            Language::CPP(_) => "cpp",
-            Language::C(_) => "c",
+            Language::C89 => "c",
+            Language::C99 => "c",
+            Language::C11 => "c",
+            Language::C17 => "c",
+            Language::C23 => "c",
+            Language::Cpp98 => "cpp",
+            Language::Cpp11 => "cpp",
+            Language::Cpp14 => "cpp",
+            Language::Cpp17 => "cpp",
+            Language::Cpp20 => "cpp",
+            Language::Cpp23 => "cpp",
         }
     }
 

@@ -1,5 +1,5 @@
 use crate::model::ProjectConfig;
-use crate::model::{CStandard, CppStandard, Generator, Language};
+use crate::model::{Generator, Language};
 use crate::util::get_cmake_version;
 use git2::Repository;
 use indoc::{formatdoc, indoc};
@@ -81,36 +81,12 @@ pub fn generate_project(
     let cmakelists_path = format!("{path}/CMakeLists.txt");
     let mut cmakelists_file = File::create(cmakelists_path)?;
 
-    match lang {
-        Language::C(standard) => {
-            let main_path = format!("{}/main.c", src_path);
-            let header_path = format!("{}/example.h", include_path);
-            let implementation_path = format!("{}/example.c", src_path);
-
-            let mut main_file = File::create(main_path)?;
-            let mut header_file = File::create(header_path)?;
-            let mut implementation_file = File::create(implementation_path)?;
-
-            cmakelists_file.write_all(get_c_cmakelists(&project_name, standard).as_bytes())?;
-
-            main_file.write_all(EXAMPLE_C_PROGRAM.as_bytes())?;
-            header_file.write_all(EXAMPLE_C_HEADER.as_bytes())?;
-            implementation_file.write_all(EXAMPLE_C_IMPLEMENTATION.as_bytes())?;
+    match lang.is_c() {
+        true => {
+            init_c_project(&project_name, &src_path, lang, &include_path, &mut cmakelists_file)?;
         }
-        Language::CPP(standard) => {
-            let main_path = format!("{}/main.cpp", src_path);
-            let header_path = format!("{}/example.hpp", include_path);
-            let implementation_path = format!("{}/example.cpp", src_path);
-
-            let mut main_file = File::create(main_path)?;
-            let mut header_file = File::create(header_path)?;
-            let mut implementation_file = File::create(implementation_path)?;
-
-            cmakelists_file.write_all(get_cpp_cmakelists(&project_name, standard).as_bytes())?;
-
-            main_file.write_all(EXAMPLE_CPP_PROGRAM.as_bytes())?;
-            header_file.write_all(EXAMPLE_CPP_HEADER.as_bytes())?;
-            implementation_file.write_all(EXAMPLE_CPP_IMPLEMENTATION.as_bytes())?;
+        false => {
+            init_cpp_project(&project_name, lang, include_path, src_path, &mut cmakelists_file)?;
         }
     }
 
@@ -149,6 +125,52 @@ pub fn generate_project(
     Ok(())
 }
 
+pub fn init_cpp_project(
+    project_name: &String,
+    standard: Language,
+    src_path: String,
+    include_path: String,
+    cmakelists_file: &mut File,
+) -> Result<(), Error> {
+    let main_path = format!("{}/main.cpp", src_path);
+    let header_path = format!("{}/example.hpp", include_path);
+    let implementation_path = format!("{}/example.cpp", src_path);
+
+    let mut main_file = File::create(main_path)?;
+    let mut header_file = File::create(header_path)?;
+    let mut implementation_file = File::create(implementation_path)?;
+
+    cmakelists_file.write_all(get_cpp_cmakelists(&project_name, standard).as_bytes())?;
+
+    main_file.write_all(EXAMPLE_CPP_PROGRAM.as_bytes())?;
+    header_file.write_all(EXAMPLE_CPP_HEADER.as_bytes())?;
+    implementation_file.write_all(EXAMPLE_CPP_IMPLEMENTATION.as_bytes())?;
+    Ok(())
+}
+
+pub fn init_c_project(
+    project_name: &String,
+    src_path: &String,
+    standard: Language,
+    include_path: &String,
+    cmakelists_file: &mut File,
+) -> Result<(), Error> {
+    let main_path = format!("{}/main.c", src_path);
+    let header_path = format!("{}/example.h", include_path);
+    let implementation_path = format!("{}/example.c", src_path);
+
+    let mut main_file = File::create(main_path)?;
+    let mut header_file = File::create(header_path)?;
+    let mut implementation_file = File::create(implementation_path)?;
+
+    cmakelists_file.write_all(get_c_cmakelists(&project_name, standard).as_bytes())?;
+
+    main_file.write_all(EXAMPLE_C_PROGRAM.as_bytes())?;
+    header_file.write_all(EXAMPLE_C_HEADER.as_bytes())?;
+    implementation_file.write_all(EXAMPLE_C_IMPLEMENTATION.as_bytes())?;
+    Ok(())
+}
+
 pub fn configure_cmake_project(
     path: &String,
     generator: Option<Generator>,
@@ -173,19 +195,19 @@ pub fn configure_cmake_project(
     cmake_status
 }
 
-fn get_c_cmakelists(project_name: &String, standard: CStandard) -> String {
+fn get_c_cmakelists(project_name: &String, standard: Language) -> String {
     get_common_cmakelists(
         project_name,
-        format!("set(CMAKE_C_STANDARD {standard})"),
+        format!("set(CMAKE_C_STANDARD {})", standard.get_lang_and_standard().1),
         "SOURCES",
         "HEADERS",
     )
 }
 
-fn get_cpp_cmakelists(project_name: &String, standard: CppStandard) -> String {
+fn get_cpp_cmakelists(project_name: &String, language: Language) -> String {
     get_common_cmakelists(
         project_name,
-        format!("set(CMAKE_CXX_STANDARD {standard})"),
+        format!("set(CMAKE_CXX_STANDARD {})", language.get_lang_and_standard().1),
         "SOURCES",
         "HEADERS",
     )

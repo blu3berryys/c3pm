@@ -5,15 +5,16 @@ use crate::util::get_current_path;
 use clap::Parser;
 use std::path::PathBuf;
 use std::str::FromStr;
+
 mod cli;
 mod generator;
+mod impls;
 mod model;
 mod util;
-mod impls;
 
 fn main() -> Result<(), String> {
     let args = C3pmArgs::parse();
-    
+
     match args.new_cmd {
         NewSubcmd::New {
             name,
@@ -38,14 +39,6 @@ fn main() -> Result<(), String> {
                     .ok_or_else(|| "Could not determine project name from directory".to_string())?
                     .to_string(),
             };
-
-            //           generate_project(
-            //               current_dir.to_str().unwrap().to_string(),
-            //               project_name,
-            //               generator,
-            //               language,
-            //           )
-            //           .map_err(|e| e.to_string())?;
 
             util::create_new_project(
                 project_name,

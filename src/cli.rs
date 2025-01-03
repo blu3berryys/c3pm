@@ -1,6 +1,7 @@
-use crate::model::{BuildConfig, CStandard, CppStandard, Generator, Language};
+use crate::model::{BuildConfig, Generator, Language};
 use crate::util::AVAILABLE_THREADS;
 use clap::{Parser, Subcommand};
+use std::str::FromStr;
 
 #[derive(Parser, Debug)]
 pub struct C3pmArgs {
@@ -17,7 +18,13 @@ pub enum NewSubcmd {
         name: String,
 
         /// The generator to use
-        #[arg(short, long, required = false, help = "The name of the generator to use (use this flag without an argument for a list of possible values)", hide_possible_values = true)]
+        #[arg(
+            short,
+            long,
+            required = false,
+            help = "The name of the generator to use (use this flag without an argument for a list of possible values)",
+            hide_possible_values = true
+        )]
         generator: Option<Generator>,
 
         /// The language of the project (can either be "c", "cpp", "cxx", or "c++")
@@ -34,7 +41,13 @@ pub enum NewSubcmd {
         name: Option<String>,
 
         /// The generator to use
-        #[arg(short, long, required = false, help = "The name of the generator to use (use this flag without an argument for a list of possible values)", hide_possible_values = true)]
+        #[arg(
+            short,
+            long,
+            required = false,
+            help = "The name of the generator to use (use this flag without an argument for a list of possible values)",
+            hide_possible_values = true
+        )]
         generator: Option<Generator>,
 
         /// The language of the project (can either be "c", "cpp", "cxx", or "c++")
@@ -56,19 +69,24 @@ pub enum NewSubcmd {
 fn parse_language(lang: &str) -> Result<Language, String> {
     let input: Vec<&str> = lang.split(':').collect();
     let lang = input[0];
+    let language = Language::from_str(lang)?;
     let standard = input.get(1);
-    let supported_langs = ["c", "cpp", "cxx", "c++"];
+    let supported_langs = if language.is_c() {
+        vec!["c89", "c99", "c11", "c17", "c23"]
+    } else {
+        vec!["cpp98", "cpp11", "cpp14", "cpp17", "cpp20", "cpp23"]
+    };
 
     if supported_langs[0] == lang {
         let standard = standard.map(|t| *t).unwrap_or("23");
-        let standard = CStandard::try_from(standard)?;
-        return Ok(Language::C(standard));
+        let standard = Language::from_str(lang);
+        return Ok(standard?);
     }
 
     if supported_langs[1..].contains(&lang) {
         let standard = standard.map(|t| *t).unwrap_or("23");
-        let standard = CppStandard::try_from(standard)?;
-        return Ok(Language::CPP(standard));
+        let standard = Language::from_str(lang);
+        return Ok(standard?);
     }
 
     let formatted_possible_values = supported_langs.join(", ");

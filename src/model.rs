@@ -1,25 +1,15 @@
 use clap::ValueEnum;
 use serde::{Deserialize, Serialize};
-use std::fmt::Formatter;
 use std::collections::HashMap;
+use std::fmt::Formatter;
 
 #[derive(Debug, Clone, Copy, Serialize, Deserialize)]
 pub enum Language {
-    C(CStandard),
-    CPP(CppStandard),
-}
-
-#[derive(Debug, Clone, Copy, Serialize, Deserialize)]
-pub enum CStandard {
     C89,
     C99,
     C11,
     C17,
     C23,
-}
-
-#[derive(Debug, Clone, Copy, Serialize, Deserialize)]
-pub enum CppStandard {
     Cpp98,
     Cpp11,
     Cpp14,
@@ -142,4 +132,9 @@ pub struct ProjectConfig {
     pub project_details: ProjectDetails,
     #[serde(default)]
     pub dirs: HashMap<String, String>,
+}
+
+pub struct LanguageData {
+    pub name: String,
+    pub standard: String,
 }

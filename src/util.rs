@@ -27,7 +27,7 @@ pub fn get_current_path() -> io::Result<String> {
 
 pub fn read_file_to_lines(path: &str) -> io::Result<Vec<String>> {
     let mut lines: Vec<String> = Vec::new();
-    let file_contents = fs::read_to_string(path)?;
+    let file_contents = read_to_string(path)?;
 
     for line in file_contents.lines() {
         lines.push(line.to_string());
@@ -37,7 +37,7 @@ pub fn read_file_to_lines(path: &str) -> io::Result<Vec<String>> {
 }
 
 pub fn read_file_to_string(path: &str) -> io::Result<String> {
-    fs::read_to_string(path)
+    read_to_string(path)
 }
 
 pub fn create_dir<T1, T2>(parent: T1, name: T2) -> io::Result<String>
