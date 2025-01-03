@@ -1,6 +1,7 @@
 #![allow(dead_code, unused_variables)]
 
 use crate::cli::{C3pmArgs, NewSubcmd};
+use crate::generator::configure_cmake_project;
 use crate::util::get_current_path;
 use clap::Parser;
 use std::path::PathBuf;
@@ -55,5 +56,16 @@ fn main() -> Result<(), String> {
             generator,
         } => util::build_project(&jobs, &config, generator),
         NewSubcmd::Clean {} => Ok(util::clean_project().expect("fuck")),
+        NewSubcmd::Reconfigure { generator } => {
+            util::clean_project().expect("fuck");
+
+            match generator {
+                Some(gen) => configure_cmake_project(&get_current_path().expect("fuck"), Some(gen)),
+                None => configure_cmake_project(&get_current_path().unwrap(), None),
+            }
+            .expect("owo");
+
+            Ok(())
+        }
     }
 }

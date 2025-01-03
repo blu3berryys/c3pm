@@ -53,7 +53,7 @@ pub enum NewSubcmd {
         generator: Option<Generator>,
 
         /// The language to use for the project (format the value as `{language (c/cpp)}{standard (valid standard num for language)})
-        /// 
+        ///
         /// for example, `cpppm init example -l c99` would initialize a new c3pm project using the C99 standard
         #[arg(short, long, value_parser=parse_language, default_value = "cpp23", required = false)]
         language: Language,
@@ -68,11 +68,17 @@ pub enum NewSubcmd {
         #[arg(short = 'c', long = "config", default_value = "RelWithDebInfo")]
         config: String,
 
-        #[arg(short = 'g', default_value = "ninja")]
+        /// The generator to build with
+        #[arg(short = 'g', required = false)]
         generator: Option<Generator>,
     },
     /// Cleans the c3pm project
-    Clean {}
+    Clean {},
+    /// Reconfigures the project
+    Reconfigure {
+        /// (optional) The generator to reconfigure with
+        generator: Option<Generator> 
+    },
 }
 
 fn parse_language(lang: &str) -> Result<Language, String> {
