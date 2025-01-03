@@ -1,13 +1,13 @@
 use crate::model::ProjectConfig;
 use crate::model::{Generator, Language};
-use crate::util::get_cmake_version;
 use git2::Repository;
 use indoc::{formatdoc, indoc};
 use std::io::Error;
 use std::process::{exit, ExitStatus};
 use std::{fmt::Display, fs, fs::File, io::Write, process::Command};
+use crate::get_cmake_version;
 
-const EXAMPLE_C_PROGRAM: &'static str = indoc! {r#"
+pub const EXAMPLE_C_PROGRAM: &'static str = indoc! {r#"
 #include <stdio.h>
 #include "example.h"
 
@@ -17,7 +17,7 @@ int main() {
 }
 "#};
 
-const EXAMPLE_CPP_PROGRAM: &'static str = indoc! {r#"
+pub const EXAMPLE_CPP_PROGRAM: &'static str = indoc! {r#"
 #include <iostream>
 #include "example.hpp"
 
@@ -29,7 +29,7 @@ int main() {
 }
 "#};
 
-const EXAMPLE_C_HEADER: &'static str = indoc! {r#"
+pub const EXAMPLE_C_HEADER: &'static str = indoc! {r#"
 #ifndef EXAMPLE_H
 #define EXAMPLE_H
 
@@ -40,7 +40,7 @@ void example_function();
 #endif
 "#};
 
-const EXAMPLE_CPP_HEADER: &'static str = indoc! {r#"
+pub const EXAMPLE_CPP_HEADER: &'static str = indoc! {r#"
 #ifndef EXAMPLE_HPP
 #define EXAMPLE_HPP
 
@@ -51,7 +51,7 @@ void example_function();
 #endif
 "#};
 
-const EXAMPLE_C_IMPLEMENTATION: &'static str = indoc! {r#"
+pub const EXAMPLE_C_IMPLEMENTATION: &'static str = indoc! {r#"
 #include "example.h"
 
 void example_function() {
@@ -59,7 +59,7 @@ void example_function() {
 }
 "#};
 
-const EXAMPLE_CPP_IMPLEMENTATION: &'static str = indoc! {r#"
+pub const EXAMPLE_CPP_IMPLEMENTATION: &'static str = indoc! {r#"
 #include "example.hpp"
 
 void example_function() {

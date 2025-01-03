@@ -1,10 +1,10 @@
-use crate::model;
-use crate::model::{BuildConfig, Generator, Language, Project, ProjectConfig};
 use clap::builder::ValueParser;
 use std::collections::HashMap;
 use std::fmt::{Display, Formatter};
 use std::io::Error;
 use std::str::FromStr;
+use crate::model;
+use crate::model::{BuildConfig, Generator, Language, Project, ProjectConfig};
 
 // woah
 impl Display for Generator {

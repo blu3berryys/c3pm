@@ -1,7 +1,16 @@
-use crate::model::{Generator, Language};
-use crate::util::AVAILABLE_THREADS;
 use clap::{Parser, Subcommand};
-use std::str::FromStr;
+use lazy_static::lazy_static;
+use std::thread;
+use util::model::{Generator, Language};
+use util::parse_language;
+
+lazy_static! {
+    pub static ref AVAILABLE_THREADS: usize = {
+        thread::available_parallelism()
+            .map(|n| n.get())
+            .unwrap_or(1)
+    };
+}
 
 #[derive(Parser, Debug)]
 pub struct C3pmArgs {
@@ -77,36 +86,35 @@ pub enum NewSubcmd {
     /// Reconfigures the project
     Reconfigure {
         /// (optional) The generator to reconfigure with
-        generator: Option<Generator> 
+        generator: Option<Generator>,
     },
 }
 
-fn parse_language(lang: &str) -> Result<Language, String> {
-    let input: Vec<&str> = lang.split(':').collect();
-    let lang = input[0];
-    let language = Language::from_str(lang)?;
-    let standard = input.get(1);
-    let supported_langs = if language.is_c() {
-        vec![/* "c89", */ "c99", "c11", "c17", "c23"]
-    } else {
-        vec!["cpp98", "cpp11", "cpp14", "cpp17", "cpp20", "cpp23"]
-    };
+pub fn cli() -> Result<(), String> {
+    let args = C3pmArgs::parse();
 
-    if supported_langs[0] == lang {
-        let standard = standard.map(|t| *t).unwrap_or("23");
-        let standard = Language::from_str(lang);
-        return Ok(standard?);
+    match args.subcommands {
+        NewSubcmd::New {
+            name,
+            generator,
+            language,
+            folder,
+        } => util::create_new_project(name, generator, language, folder)?,
+        NewSubcmd::Init {
+            name,
+            generator,
+            language,
+        } => Ok(util::init_project_subcommand(name, generator, language)?),
+        NewSubcmd::Build {
+            jobs,
+            config,
+            generator,
+        } => util::build_project(&jobs, &config, generator),
+        NewSubcmd::Clean {} => Ok(util::clean_project().expect("fuck")),
+        NewSubcmd::Reconfigure { generator } => {
+            util::reconfigure_project_subcommand(generator);
+
+            Ok(())
+        }
     }
-
-    if supported_langs[1..].contains(&lang) {
-        let standard = standard.map(|t| *t).unwrap_or("23");
-        let standard = Language::from_str(lang);
-        return Ok(standard?);
-    }
-
-    let formatted_possible_values = supported_langs.join(", ");
-    Err(format!(
-        "Possible values are {:?}",
-        formatted_possible_values
-    ))
 }

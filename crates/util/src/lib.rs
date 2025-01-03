@@ -1,7 +1,4 @@
-use crate::{
-    generator::{configure_cmake_project, generate_project},
-    model::{Generator, Language, ProjectConfig},
-};
+use crate::model::{Language, ProjectConfig};
 use inflector::Inflector;
 use lazy_static::lazy_static;
 use std::path::PathBuf;
@@ -15,6 +12,13 @@ use std::{
     process::Command,
     thread,
 };
+use std::str::FromStr;
+use crate::generator::{configure_cmake_project, generate_project};
+use crate::model::Generator;
+
+pub mod model;
+pub mod generator;
+pub mod impls;
 
 lazy_static! {
     pub static ref AVAILABLE_THREADS: usize = {
@@ -165,18 +169,18 @@ pub fn build_project(
     Ok(())
 }
 
-pub fn clean_project() -> std::io::Result<()> {
+pub fn clean_project() -> io::Result<()> {
     let current_dir = get_current_path()?;
     let config_path = Path::new(&current_dir).join(".cpppm.toml");
     let project_cfg = load_project_config(&config_path).unwrap();
     let build_dir = project_cfg.get_build_dir().expect("Fuck");
     let target_path = Path::new(&"target");
     let build_path = Path::new(&build_dir);
-    
+
     if build_path.exists() {
         fs::remove_dir_all(build_path)?;
     }
-    
+
     if target_path.exists() {
         fs::remove_dir_all(target_path)?;
     }
@@ -191,7 +195,7 @@ pub fn move_built_object_files(
 ) -> Result<(), String> {
     let valid_extensions = vec!["exe", "so", "dll", "pdb", "a", "o", "lib", "dylib"];
     let config_snake_case = config.to_string().to_pascal_case();
-    let build_config_dir = Path::new(&build_dir);
+    let _build_config_dir = Path::new(&build_dir);
     let target_dir = Path::new(&current_dir)
         .join("target")
         .join(config_snake_case);
@@ -239,3 +243,65 @@ pub fn load_project_config(cfg_path: &Path) -> Result<ProjectConfig, String> {
     toml::de::from_str(&cfg_str).map_err(|e| format!("Error parsing config file: {}", e))
 }
 
+pub fn init_project_subcommand(name: Option<String>, generator: Option<Generator>, language: Language) -> Result<(), String> {
+    let current_dir =
+        PathBuf::from_str(get_current_path().map_err(|e| e.to_string())?.as_str()).unwrap();
+
+    let project_name = match name {
+        Some(name) => name,
+        None => current_dir
+            .clone()
+            .file_name()
+            .and_then(|n| n.to_str())
+            .ok_or_else(|| "Could not determine project name from directory".to_string())?
+            .to_string(),
+    };
+
+    create_new_project(
+        project_name,
+        generator,
+        language,
+        Some(current_dir.to_str().unwrap().to_string()),
+    )??;
+    Ok(())
+}
+
+pub fn reconfigure_project_subcommand(generator: Option<Generator>) {
+    clean_project().expect("fuck");
+
+    match generator {
+        Some(gen) => configure_cmake_project(&get_current_path().expect("fuck"), Some(gen)),
+        None => configure_cmake_project(&get_current_path().unwrap(), None),
+    }
+        .expect("owo");
+}
+
+pub fn parse_language(lang: &str) -> Result<Language, String> {
+    let input: Vec<&str> = lang.split(':').collect();
+    let lang = input[0];
+    let language = Language::from_str(lang)?;
+    //let standard = input.get(1);
+    let supported_langs = if language.is_c() {
+        vec![/* "c89", */ "c99", "c11", "c17", "c23"]
+    } else {
+        vec!["cpp98", "cpp11", "cpp14", "cpp17", "cpp20", "cpp23"]
+    };
+
+    if supported_langs[0] == lang {
+        // let _standard = standard.map(|t| *t).unwrap_or("23");
+        let standard = Language::from_str(lang);
+        return Ok(standard?);
+    }
+
+    if supported_langs[1..].contains(&lang) {
+        //let standard = standard.map(|t| *t).unwrap_or("23");
+        let standard = Language::from_str(lang);
+        return Ok(standard?);
+    }
+
+    let formatted_possible_values = supported_langs.join(", ");
+    Err(format!(
+        "Possible values are {:?}",
+        formatted_possible_values
+    ))
+}
