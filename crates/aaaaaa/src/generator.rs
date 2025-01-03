@@ -1,11 +1,15 @@
 use crate::get_cmake_version;
-use crate::model::ProjectConfig;
+use crate::model::{Dependency, DependencyData, ProjectConfig};
 use crate::model::{Generator, Language};
 use git2::Repository;
 use indoc::{formatdoc, indoc};
+use octocrab::Octocrab;
+use serde::de::Unexpected::Str;
 use std::io::Error;
 use std::process::{exit, ExitStatus};
 use std::{fmt::Display, fs, fs::File, io::Write, process::Command};
+use octocrab::models::repos::Object::Commit;
+use octocrab::models::workflows::HeadCommit;
 
 pub const EXAMPLE_C_PROGRAM: &'static str = indoc! {r#"
 #include <stdio.h>
@@ -347,4 +351,8 @@ fn get_common_cmakelists<Env: Display>(
         add_executable({project_name} ${{{sources_var}}})
         target_include_directories({project_name} PUBLIC include)
     "#}
+}
+
+pub async fn get_latest_commit_on_remote(dep: DependencyData) -> String {
+    String::new()
 }

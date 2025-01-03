@@ -81,7 +81,7 @@ pub struct Dependency {
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct DependencyData {
     pub name: String,
-    pub repository: String,
+    pub repository: (String, String),
     pub version: Option<String>,
 }
 
