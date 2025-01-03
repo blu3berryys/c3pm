@@ -73,6 +73,18 @@ pub enum Generator {
     SublimeUnixMake,
 }
 
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct Dependency {
+    pub dependency: DependencyData,
+}
+
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct DependencyData {
+    pub name: String,
+    pub repository: String,
+    pub version: Option<String>,
+}
+
 pub fn format_display(f: &mut Formatter<'_>, string: &str) -> std::fmt::Result {
     f.write_str(string)
 }
@@ -139,9 +151,11 @@ pub struct ProjectConfig {
     pub project_details: Project,
     #[serde(default)]
     pub dirs: HashMap<String, String>,
+    #[serde(rename = "deps")]
+    pub dependencies: Option<Vec<Dependency>>,
 }
 
-pub struct LanguageData {
-    pub name: String,
-    pub standard: String,
-}
+// pub struct LanguageData {
+//     pub name: String,
+//     pub standard: String,
+// }

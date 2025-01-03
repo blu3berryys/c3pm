@@ -1,10 +1,48 @@
+use crate::model;
+use crate::model::{
+    BuildConfig, Dependency, DependencyData, Generator, Language, Project, ProjectConfig,
+};
 use clap::builder::ValueParser;
 use std::collections::HashMap;
 use std::fmt::{Display, Formatter};
 use std::io::Error;
 use std::str::FromStr;
-use crate::model;
-use crate::model::{BuildConfig, Generator, Language, Project, ProjectConfig};
+
+impl DependencyData {
+    pub fn default() -> DependencyData {
+        DependencyData {
+            name: String::new(),
+            version: None,
+            repository: String::new(),
+        }
+    }
+
+    pub fn new(name: String, version: Option<String>, repository: String) -> DependencyData {
+        DependencyData {
+            name,
+            version,
+            repository,
+        }
+    }
+}
+
+impl Dependency {
+    pub fn default() -> Dependency {
+        Dependency {
+            dependency: DependencyData::default(),
+        }
+    }
+
+    pub fn new(name: &str, version: &str, repository: &str) -> Dependency {
+        Dependency {
+            dependency: DependencyData::new(
+                name.to_string(),
+                Some(version.to_string()),
+                repository.to_string(),
+            ),
+        }
+    }
+}
 
 // woah
 impl Display for Generator {
@@ -244,6 +282,7 @@ impl Default for ProjectConfig {
         Self {
             project_details: Project::default(),
             dirs,
+            dependencies: Some(vec![Dependency::default()]),
         }
     }
 }
@@ -255,7 +294,6 @@ impl ProjectConfig {
 
     pub fn get_language(&self) -> &str {
         match self.project_details.language {
-            //Language::C89 => "c",
             Language::C99 => "c",
             Language::C11 => "c",
             Language::C17 => "c",
@@ -309,6 +347,7 @@ impl ProjectConfig {
                 language,
             },
             dirs,
+            dependencies: None,
         }
     }
 

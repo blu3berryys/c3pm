@@ -1,3 +1,4 @@
+use crate::get_cmake_version;
 use crate::model::ProjectConfig;
 use crate::model::{Generator, Language};
 use git2::Repository;
@@ -5,7 +6,6 @@ use indoc::{formatdoc, indoc};
 use std::io::Error;
 use std::process::{exit, ExitStatus};
 use std::{fmt::Display, fs, fs::File, io::Write, process::Command};
-use crate::get_cmake_version;
 
 pub const EXAMPLE_C_PROGRAM: &'static str = indoc! {r#"
 #include <stdio.h>
@@ -259,6 +259,18 @@ pub fn configure_cmake_project(
     path: &String,
     generator: Option<Generator>,
 ) -> Result<ExitStatus, Error> {
+    let c_compiler = if Command::new("clang").output()?.status.success() {
+        "clang"
+    } else {
+        "gcc"
+    };
+
+    let cxx_compiler = if Command::new("clang++").output()?.status.success() {
+        "clang++"
+    } else {
+        "g++"
+    };
+
     let cmake_status = if generator.is_some() {
         Command::new("cmake")
             .arg("-S")
@@ -267,6 +279,8 @@ pub fn configure_cmake_project(
             .arg(format!("{}/build", path))
             .arg("-G")
             .arg(generator.unwrap().to_string())
+            .arg(format!("-DCMAKE_C_COMPILER={}", c_compiler))
+            .arg(format!("-DCMAKE_CXX_COMPILER={}", cxx_compiler))
             .status()
     } else {
         Command::new("cmake")
@@ -274,6 +288,8 @@ pub fn configure_cmake_project(
             .arg(&path)
             .arg("-B")
             .arg(format!("{}/build", path))
+            .arg(format!("-DCMAKE_C_COMPILER={}", c_compiler))
+            .arg(format!("-DCMAKE_CXX_COMPILER={}", cxx_compiler))
             .status()
     };
     cmake_status

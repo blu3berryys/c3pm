@@ -104,7 +104,7 @@ pub fn cli() -> Result<(), String> {
             name,
             generator,
             language,
-        } => Ok(util::init_project_subcommand(name, generator, language)?),
+        } => util::init_project_subcommand(name, generator, language),
         NewSubcmd::Build {
             jobs,
             config,
