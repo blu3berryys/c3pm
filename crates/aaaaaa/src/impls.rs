@@ -1,7 +1,5 @@
+use crate::model::{BuildConfig, CompilerDetails, Dependency, DependencyData, Generator, Language, Project, ProjectConfig};
 use crate::{model, select_compilers};
-use crate::model::{
-    BuildConfig, Dependency, DependencyData, Generator, Language, Project, ProjectConfig,
-};
 use clap::builder::ValueParser;
 use std::collections::HashMap;
 use std::fmt::{Display, Formatter};
@@ -13,11 +11,15 @@ impl DependencyData {
         DependencyData {
             name: String::new(),
             version: None,
-            repository: String::new(),
+            repository: (String::new(), String::new()),
         }
     }
 
-    pub fn new(name: String, version: Option<String>, repository: String) -> DependencyData {
+    pub fn new(
+        name: String,
+        version: Option<String>,
+        repository: (String, String),
+    ) -> DependencyData {
         DependencyData {
             name,
             version,
@@ -33,12 +35,12 @@ impl Dependency {
         }
     }
 
-    pub fn new(name: &str, version: &str, repository: &str) -> Dependency {
+    pub fn new(name: &str, version: &str, repository: (&str, &str)) -> Dependency {
         Dependency {
             dependency: DependencyData::new(
                 name.to_string(),
                 Some(version.to_string()),
-                repository.to_string(),
+                (repository.0.to_string(), repository.1.to_string()),
             ),
         }
     }
@@ -265,13 +267,15 @@ impl Into<ValueParser> for Generator {
 impl Default for Project {
     fn default() -> Project {
         let compilers = select_compilers();
-        
+
         Self {
             name: String::new(),
             generator: None,
             language: Language::Cpp23,
-            c_compiler: Some(compilers.0),
-            cxx_compiler: Some(compilers.1),
+            compiler_settings: CompilerDetails {
+                c_compiler: Some(compilers.0),
+                cxx_compiler: Some(compilers.1),
+            }
         }
     }
 }
@@ -350,8 +354,10 @@ impl ProjectConfig {
                 name: name.to_string(),
                 generator,
                 language,
-                c_compiler: Some(compilers.0),
-                cxx_compiler: Some(compilers.1),
+                compiler_settings: CompilerDetails {
+                    c_compiler: Some(compilers.0),
+                    cxx_compiler: Some(compilers.1),
+                }
             },
             dirs,
             dependencies: None,

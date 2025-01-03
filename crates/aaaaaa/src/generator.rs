@@ -1,15 +1,11 @@
 use crate::get_cmake_version;
-use crate::model::{Dependency, DependencyData, ProjectConfig};
+use crate::model::ProjectConfig;
 use crate::model::{Generator, Language};
 use git2::Repository;
 use indoc::{formatdoc, indoc};
-use octocrab::Octocrab;
-use serde::de::Unexpected::Str;
 use std::io::Error;
 use std::process::{exit, ExitStatus};
 use std::{fmt::Display, fs, fs::File, io::Write, process::Command};
-use octocrab::models::repos::Object::Commit;
-use octocrab::models::workflows::HeadCommit;
 
 pub const EXAMPLE_C_PROGRAM: &'static str = indoc! {r#"
 #include <stdio.h>
@@ -79,8 +75,10 @@ pub fn generate_project(
 ) -> Result<(), Error> {
     let src_path = format!("{}/src", path);
     let include_path = format!("{}/include", path);
+    let dependencies_path = format!("{}/dependencies", path);
     fs::create_dir_all(&src_path)?;
     fs::create_dir_all(&include_path)?;
+    fs::create_dir_all(&dependencies_path)?;
 
     let cmakelists_path = format!("{path}/CMakeLists.txt");
     let mut cmakelists_file = File::create(cmakelists_path)?;
@@ -353,6 +351,6 @@ fn get_common_cmakelists<Env: Display>(
     "#}
 }
 
-pub async fn get_latest_commit_on_remote(dep: DependencyData) -> String {
-    String::new()
-}
+// pub async fn get_latest_commit_on_remote() -> String {
+//     String::new()
+// }

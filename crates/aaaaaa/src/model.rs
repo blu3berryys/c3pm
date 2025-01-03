@@ -143,6 +143,12 @@ pub struct Project {
     pub name: String,
     pub generator: Option<Generator>,
     pub language: Language,
+    pub compiler_settings: CompilerDetails,
+}
+
+#[derive(Serialize, Deserialize)]
+#[serde(rename_all = "kebab-case")]
+pub struct CompilerDetails {
     pub c_compiler: Option<String>,
     pub cxx_compiler: Option<String>,
 }
