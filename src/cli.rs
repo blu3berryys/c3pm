@@ -67,7 +67,12 @@ pub enum NewSubcmd {
         /// The build config to use (e.g. Debug, RelWithDebInfo, Release)
         #[arg(short = 'c', long = "config", default_value = "RelWithDebInfo")]
         config: String,
+
+        #[arg(short = 'g', default_value = "ninja")]
+        generator: Option<Generator>,
     },
+    /// Cleans the c3pm project
+    Clean {}
 }
 
 fn parse_language(lang: &str) -> Result<Language, String> {

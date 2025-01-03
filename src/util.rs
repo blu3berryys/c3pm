@@ -165,6 +165,25 @@ pub fn build_project(
     Ok(())
 }
 
+pub fn clean_project() -> std::io::Result<()> {
+    let current_dir = get_current_path()?;
+    let config_path = Path::new(&current_dir).join(".cpppm.toml");
+    let project_cfg = load_project_config(&config_path).unwrap();
+    let build_dir = project_cfg.get_build_dir().expect("Fuck");
+    let target_path = Path::new(&"target");
+    let build_path = Path::new(&build_dir);
+    
+    if build_path.exists() {
+        fs::remove_dir_all(build_path)?;
+    }
+    
+    if target_path.exists() {
+        fs::remove_dir_all(target_path)?;
+    }
+
+    Ok(())
+}
+
 pub fn move_built_object_files(
     config: &String,
     current_dir: &String,
@@ -180,10 +199,12 @@ pub fn move_built_object_files(
     fs::create_dir_all(&target_dir).map_err(|e| e.to_string())?;
 
     let mut moved_files: Vec<PathBuf> = Vec::new();
-
     let entries = walkdir::WalkDir::new(build_dir.clone());
+
     for entry in entries.into_iter().filter_map(|e| e.ok()) {
         let file_name = entry.file_name();
+
+        // if file_name.to_str().unwrap().contains(current_dir.as_str()) {
         if let Some(extension) = entry.clone().path().extension() {
             if valid_extensions.contains(&extension.to_str().unwrap()) {
                 let source_path = entry.path();
@@ -195,6 +216,7 @@ pub fn move_built_object_files(
                 moved_files.push(dest_path);
             }
         }
+        // }
     }
 
     if moved_files.is_empty() {
@@ -216,3 +238,4 @@ pub fn load_project_config(cfg_path: &Path) -> Result<ProjectConfig, String> {
     let cfg_str = read_to_string(cfg_path).map_err(|e| format!("Error reading config: {}", e))?;
     toml::de::from_str(&cfg_str).map_err(|e| format!("Error parsing config file: {}", e))
 }
+

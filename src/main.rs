@@ -49,6 +49,11 @@ fn main() -> Result<(), String> {
 
             Ok(())
         }
-        NewSubcmd::Build { jobs, config } => util::build_project(&jobs, &config, None),
+        NewSubcmd::Build {
+            jobs,
+            config,
+            generator,
+        } => util::build_project(&jobs, &config, generator),
+        NewSubcmd::Clean {} => Ok(util::clean_project().expect("fuck")),
     }
 }
