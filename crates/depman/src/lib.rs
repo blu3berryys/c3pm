@@ -1,6 +1,8 @@
+use octocrab::Octocrab;
 use serde::{Deserialize, Serialize};
 use std::fmt::Display;
 use std::process::{Command, Output};
+use util::model::Dependency;
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub enum Host {
@@ -75,6 +77,15 @@ pub fn git_switch(branch: &str, path: &str) -> std::io::Result<()> {
         },
         move || println!("fuck"),
     );
-    
+
     Ok(())
+}
+
+pub async fn get_dependencies_from_repo(owner: &str, name: &str) -> Vec<Dependency> {
+    let octocrab = Octocrab::builder()
+        .build()
+        .expect("Failed to build Octocrab client");
+    let repo = octocrab.;
+
+    Vec::new()
 }

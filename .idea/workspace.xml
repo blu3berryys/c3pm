@@ -10,9 +10,14 @@
     <list default="true" id="109c83d0-ec7e-4aaf-838d-b4657583838e" name="Changes" comment="Add some deps that'll most likely be used later on :3">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Cargo.lock" beforeDir="false" afterPath="$PROJECT_DIR$/Cargo.lock" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Cargo.toml" beforeDir="false" afterPath="$PROJECT_DIR$/Cargo.toml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/crates/cpppm/Cargo.toml" beforeDir="false" afterPath="$PROJECT_DIR$/crates/cpppm/Cargo.toml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/crates/cpppm/src/main.rs" beforeDir="false" afterPath="$PROJECT_DIR$/crates/cpppm/src/main.rs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/crates/aaaaaa/Cargo.toml" beforeDir="false" afterPath="$PROJECT_DIR$/crates/util/Cargo.toml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/crates/aaaaaa/src/generator.rs" beforeDir="false" afterPath="$PROJECT_DIR$/crates/util/src/generator.rs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/crates/aaaaaa/src/impls.rs" beforeDir="false" afterPath="$PROJECT_DIR$/crates/util/src/impls.rs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/crates/aaaaaa/src/lib.rs" beforeDir="false" afterPath="$PROJECT_DIR$/crates/util/src/lib.rs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/crates/aaaaaa/src/model.rs" beforeDir="false" afterPath="$PROJECT_DIR$/crates/util/src/model.rs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/crates/cli/Cargo.toml" beforeDir="false" afterPath="$PROJECT_DIR$/crates/cli/Cargo.toml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/crates/depman/Cargo.toml" beforeDir="false" afterPath="$PROJECT_DIR$/crates/depman/Cargo.toml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/crates/depman/src/lib.rs" beforeDir="false" afterPath="$PROJECT_DIR$/crates/depman/src/lib.rs" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
