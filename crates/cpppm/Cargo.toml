@@ -5,3 +5,5 @@ edition = "2021"
 
 [dependencies]
 cli = { version = "0.1.0", path = "../cli" }
+depman = { version = "0.1.0", path = "../depman" }
+tokio = { version = "1.42.0", features = ["full"] }
