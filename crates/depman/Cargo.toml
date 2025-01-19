@@ -6,7 +6,7 @@ edition = "2021"
 [dependencies]
 anyhow = "1.0.95"
 git2 = "0.19.0"
-octocrab = "0.42.1"
+octocrab = "0.43.0"
 serde = { version = "1.0.217", features = ["derive"] }
 toml = "0.8.19"
 util = { version = "0.1.0", path = "../util" }
