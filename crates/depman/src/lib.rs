@@ -1,91 +1,84 @@
-use octocrab::Octocrab;
-use serde::{Deserialize, Serialize};
-use std::fmt::Display;
-use std::process::{Command, Output};
+use git2::ErrorCode::Exists;
+use git2::Repository;
+use serde::Deserialize;
+use std::error::Error;
+use std::fs;
+use std::path::Path;
 use util::model::Dependency;
 
-#[derive(Debug, Clone, Serialize, Deserialize)]
-pub enum Host {
-    Github,
-    Gitlab,
-    Codeberg,
+#[derive(Debug, Clone, Deserialize)]
+pub struct Depman {
+    #[serde(rename = "deps")]
+    dependencies: Vec<Dependency>,
 }
 
-#[derive(Debug, Clone, Serialize, Deserialize, Default)]
-pub struct DependencyRepo {
-    pub host: Option<Host>,
-    pub owner: String,
-    pub name: String,
-    pub version: String,
-}
+impl Depman {
+    pub fn from_repo(repo_path: &Path) -> Result<Self, Box<dyn Error>> {
+        let toml_path = repo_path.join(".c3pm.toml");
+        let toml_contents = fs::read_to_string(toml_path)?;
+        let depman: Depman = toml::from_str(&toml_contents)?;
 
-impl Display for Host {
-    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        let str = match &self {
-            Host::Github => "https://github.com/".to_string(),
-            Host::Gitlab => "https://gitlab.com/".to_string(),
-            Host::Codeberg => "https://codeberg.com/".to_string(),
-        };
-
-        write!(f, "{}", str)
+        Ok(depman)
     }
-}
 
-impl DependencyRepo {
-    pub fn new(host: Option<Host>, owner: String, name: String, version: String) -> DependencyRepo {
-        DependencyRepo {
-            host,
-            owner,
-            name,
-            version,
+    pub fn retrieve_dependencies(&self, base_path: &Path) -> Result<(), Box<dyn Error>> {
+        let deps_dir = base_path.join("deps");
+        fs::create_dir_all(&deps_dir)?;
+
+        for dependency in &self.dependencies {
+            let repo_url = format!(
+                "https://{}/{}/{}.git",
+                dependency
+                    .clone()
+                    .dependency
+                    .host
+                    .unwrap_or("github.com".to_string()),
+                dependency.clone().dependency.repository.0,
+                dependency.clone().dependency.repository.1
+            );
+            let dependency_name = &dependency.clone().dependency.name;
+            let dependency_path = deps_dir.join(dependency_name);
+
+            if let Err(e) = Repository::clone_recurse(repo_url.as_str(), &dependency_path) {
+                if e.code() == Exists {
+                    eprintln!("Repository {} already exists, skipping...", dependency_name);
+                    continue;
+                } else {
+                    return Err(Box::new(e));
+                }
+            }
+
+            let dep_repo = Repository::open(&dependency_path)?;
+            let object = dep_repo.revparse_single(
+                dependency
+                    .clone()
+                    .dependency
+                    .revision
+                    .unwrap_or("".to_string())
+                    .as_str(),
+            );
+            dep_repo.checkout_tree(&object.unwrap(), None)?;
+
+            let dep_deps = Depman::from_repo(&dependency_path)?;
+            dep_deps.retrieve_dependencies(&dependency_path)?
         }
-    }
 
-    pub fn default() -> DependencyRepo {
-        DependencyRepo {
-            host: Some(Host::Github),
-            ..Default::default()
-        }
+        Ok(())
     }
 }
 
-fn cmd_exists(exe: &str) -> bool {
-    !Command::new(exe).get_program().is_empty()
-}
+pub fn fetch_repository(url: &str, base_path: &Path) -> Result<Depman, Box<dyn Error>> {
+    let repo_name = url
+        .split('/')
+        .last()
+        .unwrap_or("repo")
+        .trim_end_matches(".git");
+    let repo_path = base_path.join("deps").join(repo_name);
 
-pub fn run_if_which<T, U>(exec: &str, code: T, alt_code: U)
-where
-    T: FnOnce(),
-    U: FnOnce(),
-{
-    match cmd_exists(exec) {
-        true => code(),
-        false => alt_code(),
-    }
-}
+    Repository::clone_recurse(url, &repo_path)?;
 
-pub fn git_switch(branch: &str, path: &str) -> std::io::Result<()> {
-    run_if_which(
-        "git-switch",
-        move || {
-            Command::new("git")
-                .current_dir(path)
-                .arg("switch")
-                .arg(branch)
-                .output()
-                .expect("fuck");
-        },
-        move || println!("fuck"),
-    );
+    let depman = Depman::from_repo(&repo_path)?;
+    depman.retrieve_dependencies(&repo_path)?;
 
-    Ok(())
-}
-
-pub async fn get_dependencies_from_repo(owner: &str, name: &str) -> Vec<Dependency> {
-    let octocrab = Octocrab::builder()
-        .build()
-        .expect("Failed to build Octocrab client");
-    let repo = octocrab.;
-
-    Vec::new()
+    Ok(depman)
 }

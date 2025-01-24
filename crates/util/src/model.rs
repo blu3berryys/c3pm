@@ -81,8 +81,9 @@ pub struct Dependency {
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct DependencyData {
     pub name: String,
+    pub host: Option<String>,
     pub repository: (String, String),
-    pub version: Option<String>,
+    pub revision: Option<String>,
 }
 
 pub fn format_display(f: &mut Formatter<'_>, string: &str) -> std::fmt::Result {

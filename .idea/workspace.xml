@@ -8,16 +8,13 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="109c83d0-ec7e-4aaf-838d-b4657583838e" name="Changes" comment="Add some deps that'll most likely be used later on :3">
-      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Cargo.lock" beforeDir="false" afterPath="$PROJECT_DIR$/Cargo.lock" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/crates/aaaaaa/Cargo.toml" beforeDir="false" afterPath="$PROJECT_DIR$/crates/util/Cargo.toml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/crates/aaaaaa/src/generator.rs" beforeDir="false" afterPath="$PROJECT_DIR$/crates/util/src/generator.rs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/crates/aaaaaa/src/impls.rs" beforeDir="false" afterPath="$PROJECT_DIR$/crates/util/src/impls.rs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/crates/aaaaaa/src/lib.rs" beforeDir="false" afterPath="$PROJECT_DIR$/crates/util/src/lib.rs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/crates/aaaaaa/src/model.rs" beforeDir="false" afterPath="$PROJECT_DIR$/crates/util/src/model.rs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/crates/cli/Cargo.toml" beforeDir="false" afterPath="$PROJECT_DIR$/crates/cli/Cargo.toml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Cargo.toml" beforeDir="false" afterPath="$PROJECT_DIR$/Cargo.toml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/crates/cpppm/Cargo.toml" beforeDir="false" afterPath="$PROJECT_DIR$/crates/cpppm/Cargo.toml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/crates/cpppm/src/main.rs" beforeDir="false" afterPath="$PROJECT_DIR$/crates/cpppm/src/main.rs" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/crates/depman/Cargo.toml" beforeDir="false" afterPath="$PROJECT_DIR$/crates/depman/Cargo.toml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/crates/depman/src/lib.rs" beforeDir="false" afterPath="$PROJECT_DIR$/crates/depman/src/lib.rs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/crates/util/Cargo.toml" beforeDir="false" afterPath="$PROJECT_DIR$/crates/util/Cargo.toml" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -48,7 +45,7 @@
   &quot;associatedIndex&quot;: 3
 }</component>
   <component name="ProjectId" id="2r08pkrqnYMB3RAm3l8gbHuzAvf" />
-  <component name="ProjectLevelVcsManager">
+  <component name="ProjectLevelVcsManager" settingsEditedManually="true">
     <ConfirmationsSetting value="2" id="Add" />
   </component>
   <component name="ProjectViewState">
@@ -74,7 +71,7 @@
     "org.rust.first.attach.projects": "true",
     "org.rust.hideNoCargoProjectNotificationsD:/Projects/petprojects/cppppm/crates/cpppm/Cargo.toml": "true",
     "run.code.analysis.last.selected.profile": "pProject Default",
-    "settings.editor.selected.configurable": "inlay.hints",
+    "settings.editor.selected.configurable": "project.propVCSSupport.DirectoryMappings",
     "vue.rearranger.settings.migration": "true"
   }
 }]]></component>
@@ -137,6 +134,7 @@
       <workItem from="1735684817600" duration="784000" />
       <workItem from="1735685617307" duration="2128000" />
       <workItem from="1735865194618" duration="13403000" />
+      <workItem from="1737752467219" duration="2716000" />
     </task>
     <task id="LOCAL-00001" summary="Add some deps that'll most likely be used later on :3">
       <option name="closed" value="true" />

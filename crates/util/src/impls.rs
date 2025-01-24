@@ -1,4 +1,7 @@
-use crate::model::{BuildConfig, CompilerDetails, Dependency, DependencyData, Generator, Language, Project, ProjectConfig};
+use crate::model::{
+    BuildConfig, CompilerDetails, Dependency, DependencyData, Generator, Language, Project,
+    ProjectConfig,
+};
 use crate::{model, select_compilers};
 use clap::builder::ValueParser;
 use std::collections::HashMap;
@@ -10,7 +13,8 @@ impl DependencyData {
     pub fn default() -> DependencyData {
         DependencyData {
             name: String::new(),
-            version: None,
+            revision: None,
+            host: Some("github.com".to_string()),
             repository: (String::new(), String::new()),
         }
     }
@@ -18,11 +22,13 @@ impl DependencyData {
     pub fn new(
         name: String,
         version: Option<String>,
+        host: Option<String>,
         repository: (String, String),
     ) -> DependencyData {
         DependencyData {
             name,
-            version,
+            revision: version,
+            host,
             repository,
         }
     }
@@ -40,6 +46,7 @@ impl Dependency {
             dependency: DependencyData::new(
                 name.to_string(),
                 Some(version.to_string()),
+                Some("github.com".to_string()),
                 (repository.0.to_string(), repository.1.to_string()),
             ),
         }
@@ -243,12 +250,12 @@ impl FromStr for BuildConfig {
 
     fn from_str(input: &str) -> Result<Self, Self::Err> {
         match input.to_lowercase().as_str() {
-            "Debug" => Ok(BuildConfig::Debug),
-            "RelWithDebInfo" => Ok(BuildConfig::RelWithDebInfo),
-            "Release" => Ok(BuildConfig::Release),
-            "MinSizeRel" => Ok(BuildConfig::MinSizeRel),
-            _ => Err("Invalid BuildConfig. Possible values are: Debug, RelWithDebInfo, Release, MinSizeRel".to_string()),
-        }
+			"Debug" => Ok(BuildConfig::Debug),
+			"RelWithDebInfo" => Ok(BuildConfig::RelWithDebInfo),
+			"Release" => Ok(BuildConfig::Release),
+			"MinSizeRel" => Ok(BuildConfig::MinSizeRel),
+			_ => Err("Invalid BuildConfig. Possible values are: Debug, RelWithDebInfo, Release, MinSizeRel".to_string()),
+		}
     }
 }
 
@@ -275,7 +282,7 @@ impl Default for Project {
             compiler: CompilerDetails {
                 c_compiler: Some(compilers.0),
                 cxx_compiler: Some(compilers.1),
-            }
+            },
         }
     }
 }
@@ -357,7 +364,7 @@ impl ProjectConfig {
                 compiler: CompilerDetails {
                     c_compiler: Some(compilers.0),
                     cxx_compiler: Some(compilers.1),
-                }
+                },
             },
             dirs,
             dependencies: None,
