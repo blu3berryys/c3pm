@@ -9,12 +9,12 @@ cmake-parser = "0.1.0-beta.1"
 git2 = "0.20.0"
 indoc = "2.0.5"
 lazy_static = "1.5.0"
-octocrab = "0.42.1"
-toml = "0.8.19"
+octocrab = "0.43.0"
+toml = "0.8.20"
 walkdir = "2.5.0"
 
 [dependencies.clap]
-version = "4.5.23"
+version = "4.5.29"
 features = ["derive"]
 
 [dependencies.serde]
